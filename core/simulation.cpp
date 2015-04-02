@@ -51,7 +51,7 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
         {
             QSqlQuery query;
             query.prepare(" SELECT coursesCheval, victoiresCheval, placesCheval, "
-                          " prix "
+                          " prix, arrivee "
                           " FROM day" + date.toString("yyyyMMdd") +
                           " ORDER BY prix ");
             query.bindValue(":day", "day" + startingDay.toString("yyyyMMdd"));
@@ -62,12 +62,14 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
             int victoiresChevalCol = record.indexOf("victoiresCheval");
             int placesChevalCol = record.indexOf("placesCheval");
             int raceNameColumn = record.indexOf("prix");
+            int top5Column = record.indexOf("arrivee");
             //
             float coursesCheval = 0.0f;
             float victoiresCheval = 0.0f;
             float placesCheval = 0.0f;
             QString lastRaceName = "no-race";
             QString raceName = "";
+            QString top5 = "";
             //
             while (query.next())
             {
@@ -76,7 +78,8 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
                 if(raceName != lastRaceName)
                 {
                     lastRaceName = raceName;
-                    races.push_back(Race(raceName));
+                    top5 = query.value(top5Column).toString();
+                    races.push_back(Race(raceName, top5));
                 }
                 // New pony
                 coursesCheval = query.value(courseChevalCol).toFloat();
