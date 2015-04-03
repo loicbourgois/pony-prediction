@@ -16,6 +16,4 @@ Pony::Pony(const float & races, const float & wins, const float & inTop5) :
 
 Pony::~Pony()
 {
-
 }
-

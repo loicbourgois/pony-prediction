@@ -1,16 +1,17 @@
 #pragma once
 
 #include "layer.hpp"
-#include <vector>
 
 class Brain
 {
 public:
     Brain();
-    Brain(const int & layerCount, const int & neuronsPerLayer);
+    Brain(const int &layerCount, const int &neuronsPerLayer, const int & inputsPerNeuronFirstLayer = -1);
     ~Brain();
+    void compute(const QVector<float> &inputs);
+    void teach();
 private:
-    std::vector<Layer> layers;
+    QVector<Layer> layers;
     int age;
     int wins;
     int loses;

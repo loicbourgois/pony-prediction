@@ -1,15 +1,16 @@
 #pragma once
 
-#include <vector>
+#include <QVector>
 
 class Neuron
 {
 public:
     Neuron();
     ~Neuron();
+    void compute(const QVector<float> &inputs);
+    const float & getOutput() const{return output;}
 private:
-    bool compute(const std::vector<float> &inputs);
-    bool addWeight();
-    std::vector<float> weights;
+    void addWeight();
+    QVector<float> weights;
     float output;
 };

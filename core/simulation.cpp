@@ -4,7 +4,10 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
-Simulation::Simulation()
+Simulation::Simulation() :
+    races(),
+    brains(),
+    data()
 {
     //bool ok = true;
     //QString error = "error""";
@@ -29,7 +32,7 @@ Simulation::~Simulation()
 
 }
 
-bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
+bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
 {
     bool ok = true;
     QString error = "";
@@ -88,14 +91,51 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
                 coursesCheval = query.value(courseChevalCol).toFloat();
                 victoiresCheval = query.value(victoiresChevalCol).toFloat();
                 placesCheval = query.value(placesChevalCol).toFloat();
-                race.addPony(Pony(coursesCheval, victoiresCheval, placesCheval));
+                race.addPony(coursesCheval, victoiresCheval, placesCheval);
             }
         }
-        qDebug() << races.size();
+        qDebug() << races.size() << "races are ok";
     }
     if(!ok)
     {
         qDebug() << error;
     }
+
     return ok;
+}
+
+void Simulation::prepareData()
+{
+    for(int i = 0 ; i < races.size() ; i++)
+    {
+        races[i].prepareData();
+        data.push_back(races[i].getData());
+    }
+}
+
+bool Simulation::loadBrains(const int &count, const int &layersPerBrain, const int &neuronsPerLayer)
+{
+    for(int i = 0 ; i < count ; i++)
+    {
+        brains.push_back(Brain(layersPerBrain, neuronsPerLayer, (int)Simulation::INPUTS_PER_NEURON_FIRST_LAYER));
+    }
+}
+
+void Simulation::run()
+{
+    /*int a = 0;
+    while(true)
+    {*/
+        // Compute
+        for(int i = 0 ; i < brains.size() ; i++)
+        {
+            for(int j = 0 ; j < data.size() ; j++)
+            {
+                brains[i].compute(data[j]);
+                brains[i].teach();
+            }
+        }
+       /* qDebug() << (a+=40);
+        //
+    }*/
 }

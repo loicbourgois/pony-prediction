@@ -2,14 +2,21 @@
 
 #include <QDate>
 #include "race.hpp"
-#include <vector>
+#include "brain/brain.hpp"
 
 class Simulation
 {
 public:
     Simulation();
     ~Simulation();
-    bool loadData(const QDate &startingDay, const QDate &endingDay);
+    bool loadRaces(const QDate &startingDay, const QDate &endingDay);
+    void prepareData();
+    bool loadBrains(const int & count, const int & layersPerBrain, const int & neuronsPerLayer);
+    void run();
+    static const int INPUTS_PER_NEURON_FIRST_LAYER = 2;
 private:
-    std::vector<Race> races;
+
+    QVector<Race> races;
+    QVector<Brain> brains;
+    QVector< QVector<float> > data;
 };
