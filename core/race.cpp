@@ -6,7 +6,8 @@
 Race::Race() :
     ponies(),
     top5(),
-    name("no-race")
+    name("no-race"),
+    valid(false)
 {
 
 }
@@ -14,7 +15,8 @@ Race::Race() :
 Race::Race(const QString & name, const QString & top5) :
     ponies(),
     top5(),
-    name(name)
+    name(name),
+    valid(true)
 {
     bool ok = true;
     QString error = "";
@@ -33,6 +35,7 @@ Race::Race(const QString & name, const QString & top5) :
     }
     if(!ok)
     {
+        valid = false;
         qDebug() << error;
     }
 }
@@ -42,7 +45,7 @@ Race::~Race()
 
 }
 
-void Race::addPony(const Pony & pony)
+bool Race::addPony(const Pony & pony)
 {
     ponies.push_back(pony);
 }

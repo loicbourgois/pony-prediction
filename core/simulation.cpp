@@ -71,6 +71,7 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
             QString raceName = "";
             QString top5 = "";
             //
+            Race race;
             while (query.next())
             {
                 // New race ?
@@ -79,13 +80,15 @@ bool Simulation::loadData(const QDate & startingDay, const QDate & endingDay)
                 {
                     lastRaceName = raceName;
                     top5 = query.value(top5Column).toString();
-                    races.push_back(Race(raceName, top5));
+                    if(race.isValid())
+                        races.push_back(race);
+                    race = Race(raceName, top5);
                 }
                 // New pony
                 coursesCheval = query.value(courseChevalCol).toFloat();
                 victoiresCheval = query.value(victoiresChevalCol).toFloat();
                 placesCheval = query.value(placesChevalCol).toFloat();
-                races[races.size()-1].addPony(Pony(coursesCheval, victoiresCheval, placesCheval));
+                race.addPony(Pony(coursesCheval, victoiresCheval, placesCheval));
             }
         }
         qDebug() << races.size();
