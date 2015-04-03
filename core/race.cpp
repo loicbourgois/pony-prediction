@@ -31,7 +31,6 @@ Race::Race(const QString & name, const QString & top5) :
             this->top5.push_back(top[i].toInt());
         }
     }
-
     if(!ok)
     {
         qDebug() << error;

@@ -10,7 +10,6 @@ public:
     Brain(const int & layerCount, const int & neuronsPerLayer);
     ~Brain();
 private:
-    void randomize();
     std::vector<Layer> layers;
     int age;
     int wins;
