@@ -6,27 +6,10 @@
 
 Simulation::Simulation() :
   races(),
-  brains(),
   brainThreads(),
   inputs(),
   wantedResults()
 {
-  //bool ok = true;
-  //QString error = "error""";
-  /*if(ok && !this->loadData("20150101", "20150101"))
-    {
-        ok = false;
-        error = "Couldn't load data from database";
-    }
-
-    if(!ok)
-    {
-        qDebug() << error;
-    }
-    if(ok)
-    {
-        qDebug() << "Succes loading data";
-    }*/
 }
 
 Simulation::~Simulation()
@@ -119,11 +102,6 @@ void Simulation::prepareData()
 void Simulation::loadBrains(const int &count, const int &layersPerBrain,
                             const int &neuronsPerLayer)
 {
-  for(int i = 0 ; i < count ; i++)
-  {
-    brains.push_back(Brain(layersPerBrain, neuronsPerLayer,
-                           (int)Simulation::INPUTS_PER_NEURON_FIRST_LAYER));
-  }
   for(int i = 0 ; i < count ; i++)
   {
     brainThreads.push_back(

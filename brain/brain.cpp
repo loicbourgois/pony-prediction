@@ -2,15 +2,20 @@
 #include <QDebug>
 #include "core/util.hpp"
 
+int Brain::idCount = 0;
+
 Brain::Brain() :
   layers(),
   outputs(),
   result(),
   score(0),
   attempts(0),
-  ratio(0)
+  ratio(0),
+  id()
 {
-
+  id = idCount;
+  idCount++;
+  qDebug() << id;
 }
 
 Brain::Brain(const int &layerCount, const int &neuronsPerLayer, const int & inputsPerNeuronFirstLayer) :
@@ -25,7 +30,7 @@ Brain::Brain(const int &layerCount, const int &neuronsPerLayer, const int & inpu
 
 Brain::~Brain()
 {
-
+  qDebug() << id << " dead";
 }
 
 void Brain::compute(const QVector<float> & inputs)

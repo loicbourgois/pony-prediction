@@ -14,11 +14,14 @@ class Brain
     void learn(const Result & wantedResult);
     void prepareResult(const int & ponyCount);
     const float & getRatio() const {return ratio;}
+    const int & getId() const {return id;}
   private:
+    static int idCount;
     QVector<Layer> layers;
     QVector<float> outputs;
     Result result;
     int score;
     int attempts;
     float ratio;
+    int id;
 };

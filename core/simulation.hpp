@@ -19,7 +19,6 @@ class Simulation
     static const int INPUTS_PER_NEURON_FIRST_LAYER = 2;
   private:
     QVector<Race> races;
-    QVector<Brain> brains;
     QVector<BrainThread*> brainThreads;
     QVector< QVector<float> > inputs;
     QVector<Result> wantedResults;

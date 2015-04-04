@@ -10,8 +10,6 @@ class BrainThread : public QThread
 {
     Q_OBJECT
   public:
-    BrainThread(const QVector<QVector<float> > & inputs,
-                const QVector<Result> & wantedResults, const int & seed);
     BrainThread(const int &layerCount, const int &neuronsPerLayer,
                 const int & inputsPerNeuronFirstLayer,
                 const QVector<QVector<float> > & inputs,
