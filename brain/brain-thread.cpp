@@ -25,14 +25,24 @@ void BrainThread::run()
 {
   qsrand(seed);
   go = true;
+  int steps = 0;
+  int dataId = 0;
+  int stepsPerRun = inputs.size();
+  int runs = 0;
   while(go)
   {
-    for(int i = 0 ; i < inputs.size() ; i++)
+    brain.compute(inputs[dataId]);
+    brain.prepareResult(inputs[dataId].size() / 2); // pony count
+    brain.learn(wantedResults[dataId]);
+    if(!(steps % stepsPerRun))
     {
-      brain.compute(inputs[i]);
-      brain.prepareResult(inputs[i].size() / 2);
-      brain.learn(wantedResults[i]);
+      runs++;
+      qDebug() << "Run" << runs << ":" << "brain" << brain.getId() << ":" << brain.getRatio();
+      brain.resetScore();
+      brain.mutateRandomly();
     }
-    qDebug()<<"Brain" << brain.getId() << brain.getRatio();
+    dataId++;
+    dataId %= inputs.size();
+    steps++;
   }
 }

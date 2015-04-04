@@ -55,3 +55,11 @@ void Layer::compute(const QVector<float> & inputs)
     outputs.push_back(neurons[i].getOutput());
   }
 }
+
+void Layer::mutateRandomly()
+{
+  for(int i = 0 ; i < neurons.size() ; i++)
+  {
+    neurons[i].mutateRandomly();
+  }
+}

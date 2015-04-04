@@ -4,6 +4,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
+int Simulation::idBestBrain = 0;
+
 Simulation::Simulation() :
   races(),
   brainThreads(),

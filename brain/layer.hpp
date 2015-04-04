@@ -10,6 +10,7 @@ class Layer
     Layer(const int & neuronCount, const int &inputsPerNeuronFirstLayer = 0);
     ~Layer();
     void compute(const QVector<float> & inputs);
+    void mutateRandomly();
     const QVector<float> & getOutputs() const {return outputs;}
   private:
     QVector<Neuron> neurons;

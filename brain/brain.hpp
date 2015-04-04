@@ -13,6 +13,8 @@ class Brain
     void compute(const QVector<float> &inputs);
     void learn(const Result & wantedResult);
     void prepareResult(const int & ponyCount);
+    void mutateRandomly();
+    void resetScore() {score = attempts = 0;}
     const float & getRatio() const {return ratio;}
     const int & getId() const {return id;}
   private:

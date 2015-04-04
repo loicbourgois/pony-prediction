@@ -82,3 +82,11 @@ void Brain::prepareResult(const int & ponyCount)
   result = Result(top5);
 }
 
+void Brain::mutateRandomly()
+{
+  for(int i = 0 ; i < layers.size() ; i++)
+  {
+    layers[i].mutateRandomly();
+  }
+}
+

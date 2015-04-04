@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     simulation.loadRaces(QDate(2015, 01, 01), QDate(2015, 01, 02));
     simulation.prepareData();
-    simulation.loadBrains(5, 2, 18);
+    simulation.loadBrains(5, 1, 20);
     simulation.start();
 }
 

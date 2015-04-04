@@ -9,6 +9,7 @@
 class Simulation
 {
   public:
+    static const int INPUTS_PER_NEURON_FIRST_LAYER = 2;
     Simulation();
     ~Simulation();
     bool loadRaces(const QDate &startingDay, const QDate &endingDay);
@@ -16,7 +17,7 @@ class Simulation
     void loadBrains(const int & count, const int & layersPerBrain,
                     const int & neuronsPerLayer);
     void start();
-    static const int INPUTS_PER_NEURON_FIRST_LAYER = 2;
+    static int idBestBrain;
   private:
     QVector<Race> races;
     QVector<BrainThread*> brainThreads;
