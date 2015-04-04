@@ -18,7 +18,8 @@ Brain::Brain() :
   qDebug() << id;
 }
 
-Brain::Brain(const int &layerCount, const int &neuronsPerLayer, const int & inputsPerNeuronFirstLayer) :
+Brain::Brain(const int &layerCount, const int &neuronsPerLayer,
+             const int & inputsPerNeuronFirstLayer) :
   Brain()
 {
   layers.push_back(Layer(neuronsPerLayer, inputsPerNeuronFirstLayer));

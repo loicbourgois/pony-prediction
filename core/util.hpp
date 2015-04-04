@@ -7,7 +7,7 @@
 
 class Util
 {
-public:
+  public:
     static float getRandomFloat(const float & min, const float & max);
     static int getRandomInt(const int & min, const int & max);
     template<typename T> static void debug(const T & arg);

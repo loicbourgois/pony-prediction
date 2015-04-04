@@ -37,7 +37,8 @@ void BrainThread::run()
     if(!(steps % stepsPerRun))
     {
       runs++;
-      qDebug() << "Run" << runs << ":" << "brain" << brain.getId() << ":" << brain.getRatio();
+      qDebug() << "Run" << runs << ":"
+               << "brain" << brain.getId() << ":" << brain.getRatio();
       brain.resetScore();
       brain.mutateRandomly();
     }

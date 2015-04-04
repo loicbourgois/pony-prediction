@@ -1,6 +1,4 @@
-#ifndef PONY_HPP
-#define PONY_HPP
-
+#pragma once
 
 class Pony
 {
@@ -14,5 +12,3 @@ class Pony
     float ratioWin;
     float ratioTop5;
 };
-
-#endif // PONY_HPP

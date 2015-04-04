@@ -1,5 +1,4 @@
 #include "race.hpp"
-
 #include <QStringList>
 #include <QDebug>
 
@@ -39,7 +38,7 @@ Race::Race(const QString & name, const QString & top5) :
   if(!ok)
   {
     valid = false;
-    //qDebug() << error;
+    qDebug() << error;
   }
 }
 
@@ -63,7 +62,7 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
   if(!ok)
   {
     valid = false;
-    //qDebug() << error;
+    qDebug() << error;
   }
 }
 
@@ -76,9 +75,4 @@ void Race::prepareData()
     data.push_back(ponies[i].getRatioTop5());
   }
   result = Result(top5);
-  QString z;
-  for(int i = 0 ; i < 5 ; i ++)
-  {
-    z += QString::number(top5[i]) + " ";
-  }
 }

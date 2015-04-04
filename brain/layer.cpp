@@ -1,6 +1,7 @@
 #include "layer.hpp"
 #include <QString>
 #include <QDebug>
+
 Layer::Layer() :
   neurons(),
   inputsPerNeuron(),

@@ -1,6 +1,6 @@
 #include "ui/main-window.hpp"
-#include <QApplication>
 #include <time.h>
+#include <QApplication>
 #include <QDebug>
 
 int main(int argc, char *argv[])
