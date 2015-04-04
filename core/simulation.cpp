@@ -7,7 +7,8 @@
 Simulation::Simulation() :
     races(),
     brains(),
-    data()
+    inputs(),
+    wantedResults()
 {
     //bool ok = true;
     //QString error = "error""";
@@ -109,11 +110,12 @@ void Simulation::prepareData()
     for(int i = 0 ; i < races.size() ; i++)
     {
         races[i].prepareData();
-        data.push_back(races[i].getData());
+        inputs.push_back(races[i].getInputs());
+        wantedResults.push_back(races[i].getResult());
     }
 }
 
-bool Simulation::loadBrains(const int &count, const int &layersPerBrain, const int &neuronsPerLayer)
+void Simulation::loadBrains(const int &count, const int &layersPerBrain, const int &neuronsPerLayer)
 {
     for(int i = 0 ; i < count ; i++)
     {
@@ -123,19 +125,20 @@ bool Simulation::loadBrains(const int &count, const int &layersPerBrain, const i
 
 void Simulation::run()
 {
-    /*int a = 0;
+    int a = 0;
     while(true)
-    {*/
+    {
         // Compute
         for(int i = 0 ; i < brains.size() ; i++)
         {
-            for(int j = 0 ; j < data.size() ; j++)
+            for(int j = 0 ; j < inputs.size() ; j++)
             {
-                brains[i].compute(data[j]);
-                brains[i].teach();
+                brains[i].compute(inputs[j]);
+                brains[i].prepareResult(inputs[j].size() / 2);
+                brains[i].learn(wantedResults[j]);
             }
+            //qDebug() <<  "Brain " << i << ":" << brains[i].getRatio();
         }
-       /* qDebug() << (a+=40);
-        //
-    }*/
+        qDebug() << (a+=40);
+    }
 }

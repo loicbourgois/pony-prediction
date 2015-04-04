@@ -1,12 +1,13 @@
 #include "brain.hpp"
 #include <QDebug>
+#include "core/util.hpp"
 
 Brain::Brain() :
     layers(),
-    age(0),
-    wins(0),
-    loses(0),
-    ratio(0.0f)
+    outputs(),
+    result(),
+    score(0),
+    attempts(0)
 {
 
 }
@@ -33,10 +34,46 @@ void Brain::compute(const QVector<float> & inputs)
     {
         layers[i].compute(layers[i-1].getOutputs());
     }
+    outputs = layers[layers.size()-1].getOutputs();
+    attempts++;
 }
 
-void Brain::teach()
+void Brain::learn(const Result &wantedResult)
 {
 
+    if(wantedResult.getFirst() == result.getFirst())
+    {
+        score += 1;
+    }
+    else
+    {
+        //score -= 1;
+    }
+}
+
+void Brain::prepareResult(const int & ponyCount)
+{
+    QVector<int> top5;
+    QVector<float> arrivee;
+    for(int i = 0 ; i < ponyCount ; i++)
+    {
+        arrivee.push_back(outputs[i]);
+    }
+    for(int i = 0 ; i<5 ; i++)
+    {
+        int bestId = 0;
+        int bestRatio = 0.0f;
+        for(int j = 0 ; j<arrivee.size(); j++)
+        {
+            if(arrivee[j] > bestRatio)
+            {
+                bestId = j;
+                bestRatio = arrivee[j];
+            }
+        }
+        top5.push_back(bestId);
+        arrivee.remove(bestId);
+    }
+    result = Result(top5);
 }
 

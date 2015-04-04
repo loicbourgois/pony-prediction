@@ -8,7 +8,8 @@ Race::Race() :
     top5(),
     name("no-race"),
     valid(false),
-    data()
+    data(),
+    result()
 {
 
 }
@@ -47,7 +48,7 @@ Race::~Race()
 
 }
 
-bool Race::addPony(const float & coursesCheval, const float & victoiresCheval, const float & placesCheval)
+void Race::addPony(const float & coursesCheval, const float & victoiresCheval, const float & placesCheval)
 {
     bool ok = true;
     QString error = "";
@@ -72,5 +73,11 @@ void Race::prepareData()
     {
         data.push_back(ponies[i].getRatioWin());
         data.push_back(ponies[i].getRatioTop5());
+    }
+    result = Result(top5);
+    QString z;
+    for(int i = 0 ; i < 5 ; i ++)
+    {
+        z += QString::number(top5[i]) + " ";
     }
 }
