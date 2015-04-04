@@ -5,23 +5,20 @@
 
 class Brain
 {
-public:
+  public:
     Brain();
-    Brain(const int &layerCount, const int &neuronsPerLayer, const int & inputsPerNeuronFirstLayer = -1);
+    Brain(const int &layerCount, const int &neuronsPerLayer,
+          const int & inputsPerNeuronFirstLayer);
     ~Brain();
     void compute(const QVector<float> &inputs);
     void learn(const Result & wantedResult);
     void prepareResult(const int & ponyCount);
-
-    const float & getRatio() const {return (float)score /  (float)attempts;}
-private:
+    const float & getRatio() const {return ratio;}
+  private:
     QVector<Layer> layers;
     QVector<float> outputs;
     Result result;
-    /*int age;
-    int wins;
-    int loses;
-    float ratio;*/
     int score;
     int attempts;
+    float ratio;
 };

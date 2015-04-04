@@ -4,12 +4,12 @@
 
 class Neuron
 {
-public:
+  public:
     Neuron();
     ~Neuron();
     void compute(const QVector<float> &inputs);
     const float & getOutput() const{return output;}
-private:
+  private:
     void addWeight();
     QVector<float> weights;
     float output;

@@ -2,7 +2,10 @@
 
 float Util::getRandomFloat(const float &min, const float &max)
 {
-    return ((static_cast <float>(rand())) * (max - min) / (static_cast<float>(RAND_MAX))) + min;
+    return ((static_cast <float>(qrand()))
+            * (max - min)
+            / (static_cast<float>(RAND_MAX)))
+            + min;
 }
 int Util::getRandomInt(const int &min, const int &max)
 {
