@@ -34,13 +34,10 @@ void BrainThread::run()
     brain.compute(inputs[dataId]);
     brain.prepareResult(inputs[dataId].size() / 2); // pony count
     brain.learn(wantedResults[dataId]);
-    if(!(steps % stepsPerRun))
+    if(!(steps % stepsPerRun) && steps != 0)
     {
       runs++;
-      qDebug() << "Run" << runs << ":"
-               << "brain" << brain.getId() << ":" << brain.getRatio();
-      brain.resetScore();
-      brain.mutateRandomly();
+      brain.prepareNewRun();
     }
     dataId++;
     dataId %= inputs.size();

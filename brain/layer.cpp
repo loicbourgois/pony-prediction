@@ -60,7 +60,11 @@ void Layer::compute(const QVector<float> & inputs)
 void Layer::mutateRandomly()
 {
   for(int i = 0 ; i < neurons.size() ; i++)
-  {
     neurons[i].mutateRandomly();
-  }
+}
+
+void Layer::mutate(const float & mutationRatio)
+{
+  for(int i = 0 ; i < neurons.size() ; i++)
+    neurons[i].mutate(mutationRatio);
 }

@@ -38,8 +38,18 @@ void Neuron::compute(const QVector<float> & inputs)
 void Neuron::mutateRandomly()
 {
   for(int i = 0 ; i < weights.size() ; i++)
-  {
     weights[i] = Util::getRandomFloat(-1.0f, 1.0f);
+}
+
+void Neuron::mutate(const float & mutationRatio)
+{
+  for(int i = 0 ; i < weights.size() ; i++)
+  {
+    weights[i] += Util::getRandomFloat(-mutationRatio, mutationRatio);
+    if(weights[i] > 1.0f)
+      weights[i] = 1.0f;
+    if(weights[i] < -1.0f)
+      weights[i] = -1.0f;
   }
 }
 

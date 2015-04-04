@@ -3,6 +3,11 @@
 #include "core/util.hpp"
 
 int Brain::idCount = 0;
+float Brain::bestRatio = -1.0f;
+float Brain::mutationRatio = 0.5f;
+QMutex Brain::mutexBestRatio;
+QMutex Brain::mutexBestBrain;
+Brain Brain::bestBrain;
 
 Brain::Brain() :
   layers(),
@@ -15,7 +20,6 @@ Brain::Brain() :
 {
   id = idCount;
   idCount++;
-  qDebug() << id;
 }
 
 Brain::Brain(const int &layerCount, const int &neuronsPerLayer,
@@ -31,7 +35,6 @@ Brain::Brain(const int &layerCount, const int &neuronsPerLayer,
 
 Brain::~Brain()
 {
-  qDebug() << id << " dead";
 }
 
 void Brain::compute(const QVector<float> & inputs)
@@ -83,11 +86,75 @@ void Brain::prepareResult(const int & ponyCount)
   result = Result(top5);
 }
 
+void Brain::prepareNewRun()
+{
+  evaluate();
+  mutateFromBest();
+  reset();
+}
+
 void Brain::mutateRandomly()
 {
   for(int i = 0 ; i < layers.size() ; i++)
-  {
     layers[i].mutateRandomly();
+}
+
+void Brain::mutateFromBest()
+{
+  copyFromBestBrain();
+  for(int i = 0 ; i < layers.size() ; i++)
+    layers[i].mutate(mutationRatio);
+}
+
+void Brain::evaluate()
+{
+  bool copy = false;
+  mutexBestRatio.lock();
+  if(ratio > bestRatio)
+  {
+    copy = true;
+    bestRatio = ratio;
+    qDebug() << "######################################################";
+    qDebug() << "# Brain" << id << ":" << ratio;
+    qDebug() << "######################################################";
   }
+  mutexBestRatio.unlock();
+  if(copy)
+  {
+    copyToBestBrain();
+  }
+}
+
+void Brain::reset()
+{
+  outputs.clear();
+  result = Result();
+  score = 0;
+  attempts = 0;
+  ratio = 0;
+}
+
+void Brain::copyToBestBrain()
+{
+  mutexBestBrain.lock();
+  bestBrain.layers = layers;
+  bestBrain.outputs = outputs;
+  bestBrain.result = result;
+  bestBrain.score = score;
+  bestBrain.attempts = attempts;
+  bestBrain.ratio = ratio;
+  mutexBestBrain.unlock();
+}
+
+void Brain::copyFromBestBrain()
+{
+  mutexBestBrain.lock();
+  layers = bestBrain.layers;
+  outputs = bestBrain.outputs;
+  result = bestBrain.result;
+  score = bestBrain.score;
+  attempts = bestBrain.attempts;
+  ratio = bestBrain.ratio;
+  mutexBestBrain.unlock();
 }
 

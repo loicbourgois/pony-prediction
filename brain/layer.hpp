@@ -11,6 +11,7 @@ class Layer
     ~Layer();
     void compute(const QVector<float> & inputs);
     void mutateRandomly();
+    void mutate(const float & mutationRatio);
     const QVector<float> & getOutputs() const {return outputs;}
   private:
     QVector<Neuron> neurons;

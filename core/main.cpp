@@ -7,7 +7,6 @@ int main(int argc, char *argv[])
 {
   QTime time = QTime::currentTime();
   unsigned int seed = time.msec();
-  qDebug() << seed;
   qsrand(seed);
   QApplication a(argc, argv);
   MainWindow w;

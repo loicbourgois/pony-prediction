@@ -38,7 +38,7 @@ Race::Race(const QString & name, const QString & top5) :
   if(!ok)
   {
     valid = false;
-    qDebug() << error;
+    //qDebug() << error;
   }
 }
 
@@ -62,7 +62,7 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
   if(!ok)
   {
     valid = false;
-    qDebug() << error;
+    //qDebug() << error;
   }
 }
 
