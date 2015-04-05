@@ -100,8 +100,10 @@ void Brain::mutateRandomly()
 void Brain::mutateFromBest()
 {
   copyFromBestBrain();
+  float mutationRatio = (1.0 - ratio);
+  mutationRatio *= mutationRatio;
   for(int i = 0 ; i < layers.size() ; i++)
-    layers[i].mutate(mutationRatio);
+    layers[i].mutate(mutationRatio); // mutationRatio = errorRatio²
 }
 
 void Brain::evaluate1()
