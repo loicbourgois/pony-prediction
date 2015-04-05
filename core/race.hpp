@@ -12,7 +12,8 @@ class Race
     Race(const QString & name, const QString & top5);
     ~Race();
     void addPony(const float &coursesCheval, const float &victoiresCheval,
-                 const float &placesCheval);
+                 const float &placesCheval, const float & coursesJockey,
+                 const float & victoiresJockey, const float & placesJockey);
     bool isValid(){return valid;}
     void prepareData();
     const QVector<float> & getInputs() const {return data;}

@@ -38,7 +38,7 @@ Race::Race(const QString & name, const QString & top5) :
   if(!ok)
   {
     valid = false;
-    //qDebug() << error;
+    qDebug() << error;
   }
 }
 
@@ -48,7 +48,8 @@ Race::~Race()
 }
 
 void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
-                   const float & placesCheval)
+                   const float & placesCheval, const float & coursesJockey,
+                   const float & victoiresJockey, const float & placesJockey)
 {
   bool ok = true;
   QString error = "";
@@ -57,8 +58,14 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
     ok = false;
     error = "Le cheval a participé dans moins de 1 course";
   }
+  if(ok && coursesJockey < 1)
+  {
+    ok = false;
+    error = "Le jockey a participé dans moins de 1 course";
+  }
   if(ok)
-    ponies.push_back(Pony(coursesCheval, victoiresCheval, placesCheval));
+    ponies.push_back(Pony(coursesCheval, victoiresCheval, placesCheval,
+                          coursesJockey, victoiresJockey, placesJockey));
   if(!ok)
   {
     valid = false;
@@ -73,6 +80,8 @@ void Race::prepareData()
   {
     data.push_back(ponies[i].getRatioWin());
     data.push_back(ponies[i].getRatioTop5());
+    data.push_back(ponies[i].getRatioWinJockey());
+    data.push_back(ponies[i].getRatioTop5Jockey());
   }
   result = Result(top5);
 }

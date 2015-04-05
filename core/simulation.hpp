@@ -9,7 +9,7 @@
 class Simulation
 {
   public:
-    static const int INPUTS_PER_NEURON_FIRST_LAYER = 2;
+    static const int INPUTS_PER_NEURON_FIRST_LAYER = 4;
     Simulation();
     ~Simulation();
     bool loadRaces(const QDate &startingDay, const QDate &endingDay);

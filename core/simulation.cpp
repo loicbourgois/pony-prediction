@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlError>
 
 int Simulation::idBestBrain = 0;
 
@@ -23,6 +24,7 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
 {
   bool ok = true;
   QString error = "";
+  int totalRacesCount = 0;
   QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
   db.setHostName("localhost");
   db.setDatabaseName("pony-prediction");
@@ -41,47 +43,62 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
     {
       QSqlQuery query;
       query.prepare(" SELECT coursesCheval, victoiresCheval, placesCheval, "
+                    " coursesJockey, victoiresJockey, placesJockey, "
                     " prix, arrivee "
                     " FROM day" + date.toString("yyyyMMdd") +
                     " ORDER BY prix ");
-      query.bindValue(":day", "day" + startingDay.toString("yyyyMMdd"));
-      query.exec();
-      QSqlRecord record = query.record();
-      //
-      int courseChevalCol = record.indexOf("coursesCheval");
-      int victoiresChevalCol = record.indexOf("victoiresCheval");
-      int placesChevalCol = record.indexOf("placesCheval");
-      int raceNameColumn = record.indexOf("prix");
-      int top5Column = record.indexOf("arrivee");
-      //
-      float coursesCheval = 0.0f;
-      float victoiresCheval = 0.0f;
-      float placesCheval = 0.0f;
-      QString lastRaceName = "no-race";
-      QString raceName = "";
-      QString top5 = "";
-      //
-      Race race;
-      while (query.next())
+      if(!query.exec())
+        qDebug() << "Error with query for" << "day"+date.toString("yyyyMMdd")<< ":" << query.lastError().text();
+      else
       {
-        // New race ?
-        raceName = query.value(raceNameColumn).toString();
-        if(raceName != lastRaceName)
+        QSqlRecord record = query.record();
+        //
+        int courseChevalCol = record.indexOf("coursesCheval");
+        int victoiresChevalCol = record.indexOf("victoiresCheval");
+        int placesChevalCol = record.indexOf("placesCheval");
+        int courseJockeyCol = record.indexOf("coursesJockey");
+        int victoiresJockeyCol = record.indexOf("victoiresJockey");
+        int placesJockeyCol = record.indexOf("placesJockey");
+        int raceNameColumn = record.indexOf("prix");
+        int top5Column = record.indexOf("arrivee");
+        //
+        float coursesCheval = 0.0f;
+        float victoiresCheval = 0.0f;
+        float placesCheval = 0.0f;
+        float coursesJockey = 0.0f;
+        float victoiresJockey = 0.0f;
+        float placesJockey = 0.0f;
+        QString lastRaceName = "no-race";
+        QString raceName = "";
+        QString top5 = "";
+        //
+        Race race;
+        while (query.next())
         {
-          lastRaceName = raceName;
-          top5 = query.value(top5Column).toString();
-          if(race.isValid())
-            races.push_back(race);
-          race = Race(raceName, top5);
+          // New race ?
+          raceName = query.value(raceNameColumn).toString();
+          if(raceName != lastRaceName)
+          {
+            lastRaceName = raceName;
+            top5 = query.value(top5Column).toString();
+            if(race.isValid())
+              races.push_back(race);
+            race = Race(raceName, top5);
+            totalRacesCount++;
+          }
+          // New pony
+          coursesCheval = query.value(courseChevalCol).toFloat();
+          victoiresCheval = query.value(victoiresChevalCol).toFloat();
+          placesCheval = query.value(placesChevalCol).toFloat();
+          coursesJockey = query.value(courseJockeyCol).toFloat();
+          victoiresJockey = query.value(victoiresJockeyCol).toFloat();
+          placesJockey = query.value(placesJockeyCol).toFloat();
+          race.addPony(coursesCheval, victoiresCheval, placesCheval,
+                       coursesJockey, victoiresJockey, placesJockey);
         }
-        // New pony
-        coursesCheval = query.value(courseChevalCol).toFloat();
-        victoiresCheval = query.value(victoiresChevalCol).toFloat();
-        placesCheval = query.value(placesChevalCol).toFloat();
-        race.addPony(coursesCheval, victoiresCheval, placesCheval);
       }
     }
-    qDebug() << races.size() << "races are ok";
+    qDebug() << races.size() << "/" << totalRacesCount << "races are ok";
   }
   if(!ok)
   {

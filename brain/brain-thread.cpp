@@ -1,6 +1,7 @@
 #include "brain-thread.hpp"
 #include <QDebug>
 #include <QTime>
+#include "core/simulation.hpp"
 
 BrainThread::BrainThread(const int &layerCount, const int &neuronsPerLayer,
                          const int & inputsPerNeuronFirstLayer,
@@ -32,7 +33,7 @@ void BrainThread::run()
   while(go)
   {
     brain.compute(inputs[dataId]);
-    brain.prepareResult(inputs[dataId].size() / 2); // pony count
+    brain.prepareResult(inputs[dataId].size() / Simulation::INPUTS_PER_NEURON_FIRST_LAYER); // pony count
     brain.learn(wantedResults[dataId]);
     if(!(steps % stepsPerRun) && steps != 0)
     {
