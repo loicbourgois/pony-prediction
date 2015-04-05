@@ -3,11 +3,16 @@
 #include "core/util.hpp"
 
 int Brain::idCount = 0;
-float Brain::bestRatio = -1.0f;
 float Brain::mutationRatio = 0.5f;
+int Brain::ratiosToSaveCount = 100;
+float Brain::bestRatio = -1.0f;
+Brain Brain::bestBrain;
+int Brain::bestBrainId = -1;
+QVector<float> Brain::lastNratios;
 QMutex Brain::mutexBestRatio;
 QMutex Brain::mutexBestBrain;
-Brain Brain::bestBrain;
+QMutex Brain::mutexBestBrainId;
+QMutex Brain::mutexLastNratios;
 
 Brain::Brain() :
   layers(),
@@ -86,13 +91,6 @@ void Brain::prepareResult(const int & ponyCount)
   result = Result(top5);
 }
 
-void Brain::prepareNewRun()
-{
-  evaluate();
-  mutateFromBest();
-  reset();
-}
-
 void Brain::mutateRandomly()
 {
   for(int i = 0 ; i < layers.size() ; i++)
@@ -106,22 +104,79 @@ void Brain::mutateFromBest()
     layers[i].mutate(mutationRatio);
 }
 
-void Brain::evaluate()
+void Brain::evaluate1()
 {
-  bool copy = false;
   mutexBestRatio.lock();
-  if(ratio > bestRatio)
+  bool isBest = (ratio > bestRatio);
+  mutexBestRatio.unlock();
+  if(isBest)
   {
-    copy = true;
+    mutexBestRatio.lock();
     bestRatio = ratio;
     qDebug() << "######################################################";
     qDebug() << "# Brain" << id << ":" << ratio;
     qDebug() << "######################################################";
-  }
-  mutexBestRatio.unlock();
-  if(copy)
-  {
+    mutexBestRatio.unlock();
     copyToBestBrain();
+  }
+  mutateFromBest();
+  reset();
+}
+
+void Brain::evaluate2()
+{
+  // Evaluate if best brain or not
+  mutexBestRatio.lock();
+  bool hasBestRatio = (ratio > bestRatio);
+  mutexBestRatio.unlock();
+  if(hasBestRatio)
+  {
+    mutexBestBrainId.lock();
+    bestBrainId = id;
+    qDebug() << "######################################################";
+    qDebug() << "# Brain" << id << ":" << ratio;
+    qDebug() << "######################################################";
+    mutexBestBrainId.unlock();
+    copyToBestBrain();
+  }
+  // If is best brain
+  mutexBestBrainId.lock();
+  bool isBest = (id == bestBrainId);
+  mutexBestBrainId.unlock();
+  if(isBest)
+  {
+    mutexBestRatio.lock();
+    bestRatio = ratio;
+    mutexBestRatio.unlock();
+  }
+  // Calculate average ratio
+  float averageRatio = 0.0f;
+  mutexLastNratios.lock();
+  lastNratios.push_back(ratio);
+  while(lastNratios.size() > ratiosToSaveCount)
+    lastNratios.pop_front();
+  for(int i = 0 ; i<lastNratios.size() ; i++)
+  {
+    averageRatio += lastNratios[i];
+  }
+  averageRatio /= (float)lastNratios.size();
+  mutexLastNratios.unlock();
+  // If worse than average : mutate
+  mutexBestRatio.lock();
+  bool doMutate = (ratio <= averageRatio);
+  mutexBestRatio.unlock();
+  if(doMutate)
+  {
+    mutexBestBrainId.lock();
+    if(bestBrainId == id)
+    {
+      mutexBestRatio.lock();
+      bestRatio = 0;
+      mutexBestRatio.unlock();
+    }
+    mutexBestBrainId.unlock();
+    mutateFromBest();
+    reset();
   }
 }
 

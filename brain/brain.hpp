@@ -14,10 +14,10 @@ class Brain
     void compute(const QVector<float> &inputs);
     void learn(const Result & wantedResult);
     void prepareResult(const int & ponyCount);
-    void prepareNewRun();
     void mutateRandomly();
     void mutateFromBest();
-    void evaluate();
+    void evaluate1();
+    void evaluate2();
     void reset();
     const float & getRatio() const {return ratio;}
     const int & getId() const {return id;}
@@ -25,11 +25,16 @@ class Brain
     void copyToBestBrain();
     void copyFromBestBrain();
     static int idCount;
-    static float bestRatio;
     static float mutationRatio;
+    static int ratiosToSaveCount;
+    static float bestRatio;
+    static Brain bestBrain;
+    static int bestBrainId;
+    static QVector<float> lastNratios;
     static QMutex mutexBestRatio;
     static QMutex mutexBestBrain;
-    static Brain bestBrain;
+    static QMutex mutexBestBrainId;
+    static QMutex mutexLastNratios;
     QVector<Layer> layers;
     QVector<float> outputs;
     Result result;
