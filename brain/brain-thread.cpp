@@ -37,12 +37,11 @@ void BrainThread::run()
         / Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
 
     brain.prepareResult(ponyCount);
-
     brain.learn(wantedResults[dataId]);
     if(!(steps % stepsPerRun) && steps != 0)
     {
       runs++;
-      brain.evaluate1();
+      brain.evaluate2();
     }
     dataId++;
     dataId %= inputs.size();

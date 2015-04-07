@@ -25,6 +25,8 @@ class Brain
   private:
     void copyToBestBrain();
     void copyFromBestBrain();
+    static void addRatio(const float & ratio);
+    static void updateAverageRatio();
     static int idCount;
     static float mutationRatio;
     static int ratiosToSaveCount;
@@ -32,10 +34,12 @@ class Brain
     static Brain bestBrain;
     static int bestBrainId;
     static QVector<float> lastNratios;
+    static float averageRatio;
     static QMutex mutexBestRatio;
     static QMutex mutexBestBrain;
     static QMutex mutexBestBrainId;
     static QMutex mutexLastNratios;
+    static QMutex mutexAverageRatio;
     QVector<Layer> layers;
     QVector<float> outputs;
     Result result;
@@ -45,4 +49,5 @@ class Brain
     int id;
     int neuronsPerLayer;
     int inputsPerNeuron;
+
 };

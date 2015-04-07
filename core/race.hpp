@@ -10,7 +10,7 @@ class Race
 {
   public:
     Race();
-    Race(const QDate & date, const QString & name , const QString & orderOnArrivalStr, const int & partants);
+    Race(const QDate & date, const QString & name, const QString & orderOnArrivalStr, const int & partants);
     ~Race();
     void addPony(const float &coursesCheval, const float &victoiresCheval,
                  const float &placesCheval, const float & coursesJockey,
