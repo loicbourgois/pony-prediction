@@ -19,6 +19,7 @@ class Simulation
     void start();
     static int idBestBrain;
   private:
+    static const QString DATABASE_NAME;
     QVector<Race> races;
     QVector<BrainThread*> brainThreads;
     QVector< QVector<float> > inputs;

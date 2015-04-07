@@ -38,7 +38,7 @@ Race::Race(const QString & name, const QString & top5) :
   if(!ok)
   {
     valid = false;
-    qDebug() << error;
+    //qDebug() << error;
   }
 }
 
@@ -53,6 +53,7 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
 {
   bool ok = true;
   QString error = "";
+
   if(ok && coursesCheval < 1)
   {
     ok = false;
@@ -71,6 +72,31 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
     valid = false;
     //qDebug() << error;
   }
+}
+
+bool Race::isValid()
+{
+  bool ok = true;
+  QString error = "";
+  if(valid)
+  {
+    if(ok && ponies.size() < 5)
+    {
+      ok = false;
+      error = "Il y a moins de 5 chevaux";
+    }
+    if(ok && ponies.size() > 20)
+    {
+      ok = false;
+      error = "Il y a plus de 20 chevaux dans la course";
+    }
+    if(!ok)
+    {
+      valid = false;
+      //qDebug() << error;
+    }
+  }
+  return valid;
 }
 
 void Race::prepareData()

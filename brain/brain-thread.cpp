@@ -33,7 +33,11 @@ void BrainThread::run()
   while(go)
   {
     brain.compute(inputs[dataId]);
-    brain.prepareResult(inputs[dataId].size() / Simulation::INPUTS_PER_NEURON_FIRST_LAYER); // pony count
+    int ponyCount = inputs[dataId].size()
+        / Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
+
+    brain.prepareResult(ponyCount);
+
     brain.learn(wantedResults[dataId]);
     if(!(steps % stepsPerRun) && steps != 0)
     {

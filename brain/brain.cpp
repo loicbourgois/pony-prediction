@@ -55,7 +55,10 @@ void Brain::compute(const QVector<float> & inputs)
 
 void Brain::learn(const Result &wantedResult)
 {
-  if(wantedResult.getFirst() == result.getFirst())
+  if(result.get(0) == wantedResult.get(0)
+     //|| result.get(0) == wantedResult.get(1)
+     //|| result.get(0) == wantedResult.get(2)
+     )
   {
     score += 1;
   }
@@ -88,6 +91,7 @@ void Brain::prepareResult(const int & ponyCount)
     top5.push_back(bestId);
     arrivee.remove(bestId);
   }
+
   result = Result(top5);
 }
 

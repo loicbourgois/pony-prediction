@@ -6,6 +6,7 @@
 #include <QSqlError>
 
 int Simulation::idBestBrain = 0;
+const QString Simulation::DATABASE_NAME = "pony_prediction";
 
 Simulation::Simulation() :
   races(),
@@ -27,7 +28,7 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
   int totalRacesCount = 0;
   QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
   db.setHostName("localhost");
-  db.setDatabaseName("pony-prediction");
+  db.setDatabaseName(DATABASE_NAME);
   db.setUserName("root");
   db.setPassword("");
   //
