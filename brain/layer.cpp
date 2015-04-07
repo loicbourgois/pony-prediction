@@ -25,8 +25,28 @@ Layer::~Layer()
 
 }
 
+/*void Layer::compute(const QVector<float> & inputs)
+{
+  outputs.clear();
+  QVector< QVector<float> > vectorInputs;
+  for(int i = 0 ; i < inputs.size() / inputsPerNeuron ; i++)
+  {
+    vectorInputs.push_back(QVector<float>());
+    for(int j = i*inputsPerNeuron ; j < (i+1)*inputsPerNeuron ; j++)
+    {
+      vectorInputs[i].push_back(inputs[j]);
+    }
+  }
+  for(int i = 0 ; i < vectorInputs.size() ; i++)
+  {
+    neurons[0].compute(vectorInputs[i]);
+    outputs.push_back(neurons[0].getOutput());
+  }
+}*/
+
 void Layer::compute(const QVector<float> & inputs)
 {
+  outputs.clear();
   if(inputsPerNeuron)
   {
     QVector< QVector<float> > vectorInputs;
@@ -50,7 +70,6 @@ void Layer::compute(const QVector<float> & inputs)
       neurons[i].compute(inputs);
     }
   }
-  outputs.clear();
   for(int i = 0 ; i < neurons.size() ; i++)
   {
     outputs.push_back(neurons[i].getOutput());

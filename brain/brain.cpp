@@ -1,6 +1,7 @@
 #include "brain.hpp"
 #include <QDebug>
 #include "core/util.hpp"
+#include "core/simulation.hpp"
 
 int Brain::idCount = 0;
 float Brain::mutationRatio = 0.5f;
@@ -27,11 +28,18 @@ Brain::Brain() :
   idCount++;
 }
 
-Brain::Brain(const int &layerCount, const int &neuronsPerLayer,
-             const int & inputsPerNeuronFirstLayer) :
+Brain::Brain(const int & layerCount,
+             const int & neuronsPerLayer,
+             const int & inputsPerNeuron) :
   Brain()
 {
-  layers.push_back(Layer(neuronsPerLayer, inputsPerNeuronFirstLayer));
+  this->neuronsPerLayer = neuronsPerLayer;
+  this->inputsPerNeuron = inputsPerNeuron;
+  /*for(int i = 0 ; i < layerCount ; i++)
+  {
+    layers.push_back(Layer(neuronsPerLayer));
+  }*/
+  layers.push_back(Layer(neuronsPerLayer, inputsPerNeuron));
   for(int i = 1 ; i < layerCount ; i++)
   {
     layers.push_back(Layer(neuronsPerLayer));
@@ -41,6 +49,31 @@ Brain::Brain(const int &layerCount, const int &neuronsPerLayer,
 Brain::~Brain()
 {
 }
+
+/*void Brain::compute(const QVector<float> & inputs)
+{
+  int ponyCount = inputs.size()
+      / (int)Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
+  layers[0].compute(inputs);
+  QVector<float> inputstmp;
+  QVector<float> outputstmp;
+  for(int i = 1 ; i < layers.size() ; i++)
+  {
+    outputstmp = layers[i-1].getOutputs();
+    inputstmp.clear();
+    for(int j = 0 ; j < ponyCount ; j++)
+    {
+      for(int k = 0 ; k < inputsPerNeuron ; k++)
+      {
+        inputstmp.push_back(inputs[j*inputsPerNeuron+k]);
+      }
+      inputstmp.push_back(outputstmp[j]);
+    }
+    layers[i].compute(inputstmp);
+  }
+  outputs = layers[layers.size()-1].getOutputs();
+  attempts++;
+}*/
 
 void Brain::compute(const QVector<float> & inputs)
 {
@@ -55,15 +88,9 @@ void Brain::compute(const QVector<float> & inputs)
 
 void Brain::learn(const Result &wantedResult)
 {
-  if(result.get(0) == wantedResult.get(0)
-     //|| result.get(0) == wantedResult.get(1)
-     //|| result.get(0) == wantedResult.get(2)
-     )
+  if(result.get(0) == wantedResult.get(0))
   {
     score += 1;
-  }
-  else
-  {
   }
   ratio = (float)score /  (float)attempts;
 }
@@ -73,9 +100,7 @@ void Brain::prepareResult(const int & ponyCount)
   QVector<int> orderOnarrival;
   QVector<float> arrivee;
   for(int i = 0 ; i < ponyCount ; i++)
-  {
     arrivee.push_back(outputs[i]);
-  }
   int tmp = arrivee.size();
   for(int i = 0 ; i<tmp ; i++)
   {
@@ -92,7 +117,6 @@ void Brain::prepareResult(const int & ponyCount)
     orderOnarrival.push_back(bestId);
     arrivee.remove(bestId);
   }
-
   result = Result(orderOnarrival);
 }
 

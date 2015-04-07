@@ -124,7 +124,8 @@ void Simulation::prepareData()
   }
 }
 
-void Simulation::loadBrains(const int &count, const int &layersPerBrain,
+void Simulation::loadBrains(const int &count,
+                            const int &layersPerBrain,
                             const int &neuronsPerLayer)
 {
   for(int i = 0 ; i < count ; i++)

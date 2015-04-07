@@ -8,8 +8,9 @@ class Brain
 {
   public:
     Brain();
-    Brain(const int &layerCount, const int &neuronsPerLayer,
-          const int & inputsPerNeuronFirstLayer);
+    Brain(const int &layerCount,
+          const int &neuronsPerLayer,
+          const int & inputsPerNeuron);
     ~Brain();
     void compute(const QVector<float> &inputs);
     void learn(const Result & wantedResult);
@@ -42,4 +43,6 @@ class Brain
     int attempts;
     float ratio;
     int id;
+    int neuronsPerLayer;
+    int inputsPerNeuron;
 };
