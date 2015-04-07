@@ -1,17 +1,17 @@
 #include "result.hpp"
 
 Result::Result() :
-  top5()
+  orderOnarrival()
 {
 
 }
 
-Result::Result(const QVector<int> & top5)
+Result::Result(const QVector<int> & orderOnarrival)
 {
-  this->top5.clear();
-  for(int i = 0 ; i < top5.size() ; i++)
+  this->orderOnarrival.clear();
+  for(int i = 0 ; i < orderOnarrival.size() ; i++)
   {
-    this->top5.push_back(top5[i]);
+    this->orderOnarrival.push_back(orderOnarrival[i]);
   }
 }
 

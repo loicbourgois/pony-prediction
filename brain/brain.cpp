@@ -70,13 +70,14 @@ void Brain::learn(const Result &wantedResult)
 
 void Brain::prepareResult(const int & ponyCount)
 {
-  QVector<int> top5;
+  QVector<int> orderOnarrival;
   QVector<float> arrivee;
   for(int i = 0 ; i < ponyCount ; i++)
   {
     arrivee.push_back(outputs[i]);
   }
-  for(int i = 0 ; i<5 ; i++)
+  int tmp = arrivee.size();
+  for(int i = 0 ; i<tmp ; i++)
   {
     int bestId = 0;
     int bestRatio = 0.0f;
@@ -88,11 +89,11 @@ void Brain::prepareResult(const int & ponyCount)
         bestRatio = arrivee[j];
       }
     }
-    top5.push_back(bestId);
+    orderOnarrival.push_back(bestId);
     arrivee.remove(bestId);
   }
 
-  result = Result(top5);
+  result = Result(orderOnarrival);
 }
 
 void Brain::mutateRandomly()

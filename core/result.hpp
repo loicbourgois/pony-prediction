@@ -6,11 +6,9 @@ class Result
 {
   public:
     Result();
-    Result(const QVector<int> &top5);
+    Result(const QVector<int> &orderOnarrival);
     ~Result();
-    //const int & getFirst() const {return top5[0];}
-    const int & get(const int & i) const {return top5[i];}
-    const QVector<int> & getTop5() const {return top5;}
+    const int & get(const int & i) const {return orderOnarrival[i];}
   private:
-    QVector<int> top5;
+    QVector<int> orderOnarrival;
 };

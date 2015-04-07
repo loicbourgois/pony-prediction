@@ -4,35 +4,36 @@
 
 Race::Race() :
   ponies(),
-  top5(),
+  orderOnArrival(),
   name("no-race"),
   valid(false),
   data(),
   result()
 {
-
 }
 
-Race::Race(const QString & name, const QString & top5) :
+Race::Race(const QDate & date, const QString & name, const QString & orderOnArrivalStr, const int & partants) :
   ponies(),
-  top5(),
+  orderOnArrival(),
   name(name),
   valid(true),
-  data()
+  data(),
+  date(date),
+  partants(partants)
 {
   bool ok = true;
   QString error = "";
-  QStringList top = top5.split('-');
-  if(ok && top.size()!=5)
+  QStringList orderOnArrivalStrList = orderOnArrivalStr.split('-');
+  if(ok && orderOnArrivalStrList.size()!=5)
   {
     ok = false;
-    error = "Le top 5 ne contient pas 5 chevaux : '" + top5 + "'";
+    error = "Le top 5 ne contient pas 5 chevaux : '" + orderOnArrivalStr + "'";
   }
   if(ok)
   {
-    for(int i = 0 ; i < top.size() ; i++)
+    for(int i = 0 ; i < orderOnArrivalStrList.size() ; i++)
     {
-      this->top5.push_back(top[i].toInt());
+      orderOnArrival.push_back(orderOnArrivalStrList[i].toInt());
     }
   }
   if(!ok)
@@ -44,7 +45,6 @@ Race::Race(const QString & name, const QString & top5) :
 
 Race::~Race()
 {
-
 }
 
 void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
@@ -53,7 +53,6 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
 {
   bool ok = true;
   QString error = "";
-
   if(ok && coursesCheval < 1)
   {
     ok = false;
@@ -90,10 +89,15 @@ bool Race::isValid()
       ok = false;
       error = "Il y a plus de 20 chevaux dans la course";
     }
+    /* if(ok && partants != ponies.size())
+    {
+      ok = false;
+      error = "Problème avec le nombre de cheveaux : " + QString::number(partants) + " instead of " + QString::number(ponies.size());
+    }*/
     if(!ok)
     {
       valid = false;
-      //qDebug() << error;
+      //qDebug() << error << date << name ;
     }
   }
   return valid;
@@ -109,5 +113,5 @@ void Race::prepareData()
     data.push_back(ponies[i].getRatioWinJockey());
     data.push_back(ponies[i].getRatioTop5Jockey());
   }
-  result = Result(top5);
+  result = Result(orderOnArrival);
 }

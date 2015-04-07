@@ -39,15 +39,14 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
   }
   if(ok)
   {
-    //
     for(QDate date = startingDay ; date <= endingDay ; date = date.addDays(1))
     {
       QSqlQuery query;
       query.prepare(" SELECT coursesCheval, victoiresCheval, placesCheval, "
                     " coursesJockey, victoiresJockey, placesJockey, "
-                    " prix, arrivee "
+                    " prix, arrivee, partant "
                     " FROM day" + date.toString("yyyyMMdd") +
-                    " ORDER BY prix ");
+                    " ORDER BY prix, arrivee ");
       if(!query.exec())
         qDebug() << "Error with query for" << "day"+date.toString("yyyyMMdd")<< ":" << query.lastError().text();
       else
@@ -61,7 +60,8 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
         int victoiresJockeyCol = record.indexOf("victoiresJockey");
         int placesJockeyCol = record.indexOf("placesJockey");
         int raceNameColumn = record.indexOf("prix");
-        int top5Column = record.indexOf("arrivee");
+        int orderOnArricalColumn = record.indexOf("arrivee");
+        int partantsColumn = record.indexOf("partant");
         //
         float coursesCheval = 0.0f;
         float victoiresCheval = 0.0f;
@@ -71,20 +71,25 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
         float placesJockey = 0.0f;
         QString lastRaceName = "no-race";
         QString raceName = "";
-        QString top5 = "";
+        QString orderOnArrival = "";
+        QString lastOrderOnArrival = "";
+        int partants = 0;
         //
         Race race;
         while (query.next())
         {
-          // New race ?
+          // New race
           raceName = query.value(raceNameColumn).toString();
-          if(raceName != lastRaceName)
+          orderOnArrival = query.value(orderOnArricalColumn).toString();
+          if(raceName != lastRaceName
+             || orderOnArrival != lastOrderOnArrival)
           {
             lastRaceName = raceName;
-            top5 = query.value(top5Column).toString();
+            lastOrderOnArrival = orderOnArrival;
+            partants = query.value(partantsColumn).toInt();
             if(race.isValid())
               races.push_back(race);
-            race = Race(raceName, top5);
+            race = Race(date, raceName, orderOnArrival, partants);
             totalRacesCount++;
           }
           // New pony

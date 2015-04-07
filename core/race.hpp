@@ -3,13 +3,14 @@
 #include <QVector>
 #include "pony.hpp"
 #include <QString>
+#include <QDate>
 #include "result.hpp"
 
 class Race
 {
   public:
     Race();
-    Race(const QString & name, const QString & top5);
+    Race(const QDate & date, const QString & name , const QString & orderOnArrivalStr, const int & partants);
     ~Race();
     void addPony(const float &coursesCheval, const float &victoiresCheval,
                  const float &placesCheval, const float & coursesJockey,
@@ -20,9 +21,11 @@ class Race
     const Result & getResult() const {return result;}
   private:
     QVector<Pony> ponies;
-    QVector<int> top5;
+    QVector<int> orderOnArrival;
     QString name;
+    QDate date;
     bool valid;
     QVector<float> data;
     Result result;
+    int partants;
 };
