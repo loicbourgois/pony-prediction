@@ -134,27 +134,32 @@ void Brain::mutateFromBest()
   copyFromBestBrain();
   float mutationRatio = (1.0 - ratio);
   mutationRatio *= mutationRatio;
-  mutationRatio = 0.05;
+  //mutationRatio = 0.05;
   for(int i = 0 ; i < layers.size() ; i++)
     layers[i].mutate(mutationRatio); // mutationRatio = errorRatio²
 }
 
 void Brain::evaluate1()
 {
+  // Calculate average ratio
+  addRatio(ratio);
+  updateAverageRatio();
+  //
   mutexBestRatio.lock();
   bool isBest = (ratio > bestRatio);
   mutexBestRatio.unlock();
   if(isBest)
   {
+    mutexAverageRatio.lock();
+    Util::addLog("Brain " + QString::number(id)
+                 + " : " + QString::number(ratio, 'f', 6)
+                 + " : " + QString::number(averageRatio, 'f', 6));
+    mutexAverageRatio.unlock();
     mutexBestRatio.lock();
     bestRatio = ratio;
-    qDebug() << "######################################################";
-    qDebug() << "# Brain" << id << ":" << ratio;
-    qDebug() << "######################################################";
     mutexBestRatio.unlock();
     copyToBestBrain();
   }
-
   mutateFromBest();
   reset();
 }
@@ -166,13 +171,13 @@ void Brain::evaluate2()
   updateAverageRatio();
   // Evaluate if best brain or not
   mutexAverageRatio.lock();
-  bool best = (ratio > averageRatio);
+  float averagetmp = averageRatio;
   mutexAverageRatio.unlock();
-  if(best)
+  if(ratio > averagetmp)
   {
-    qDebug() << "######################################################";
-    qDebug() << "# Brain" << id << ":" << ratio << ":" << averageRatio;
-    qDebug() << "######################################################";
+    Util::addLog("Brain " + QString::number(id)
+                 + " : " + QString::number(ratio, 'f', 6)
+                 + " : " + QString::number(averagetmp, 'f', 6));
     copyToBestBrain();
   }
   //else

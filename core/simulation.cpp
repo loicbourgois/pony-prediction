@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <core/util.hpp>
 
 int Simulation::idBestBrain = 0;
 const QString Simulation::DATABASE_NAME = "pony_prediction";
@@ -104,7 +105,11 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
         }
       }
     }
-    qDebug() << races.size() << "/" << totalRacesCount << "races are ok";
+    //qDebug() << races.size() << "/" << totalRacesCount << "races are ok";
+    Util::addLog(QString::number(races.size())
+                 + " / "
+                 + QString::number(totalRacesCount)
+                 + " races are ok");
   }
   if(!ok)
   {

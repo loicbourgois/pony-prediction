@@ -13,6 +13,10 @@ class MainWindow : public QMainWindow
   public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+  //public slots:
+    void addLog(const QString & log);
+  signals:
+    void newLog(const QString & log);
 
   private:
     Ui::MainWindow *ui;

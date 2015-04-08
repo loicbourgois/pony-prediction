@@ -53,7 +53,7 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
 {
   bool ok = true;
   QString error = "";
-  /*if(ok && coursesCheval < 1)
+  if(ok && coursesCheval < 1)
   {
     ok = false;
     error = "Le cheval a participé dans moins de 1 course";
@@ -62,7 +62,7 @@ void Race::addPony(const float & coursesCheval, const float & victoiresCheval,
   {
     ok = false;
     error = "Le jockey a participé dans moins de 1 course";
-  }*/
+  }
   if(ok)
     ponies.push_back(Pony(coursesCheval, victoiresCheval, placesCheval,
                           coursesJockey, victoiresJockey, placesJockey));
