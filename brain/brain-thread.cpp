@@ -3,7 +3,8 @@
 #include <QTime>
 #include "core/simulation.hpp"
 
-BrainThread::BrainThread(const int &layerCount, const int &neuronsPerLayer,
+BrainThread::BrainThread(const int &layerCount,
+                         const int &neuronsPerLayer,
                          const int & inputsPerNeuronFirstLayer,
                          const QVector<QVector<float> > & inputs,
                          const QVector<Result> & wantedResults,
@@ -19,7 +20,6 @@ BrainThread::BrainThread(const int &layerCount, const int &neuronsPerLayer,
 
 BrainThread::~BrainThread()
 {
-
 }
 
 void BrainThread::run()
@@ -35,7 +35,6 @@ void BrainThread::run()
     brain.compute(inputs[dataId]);
     int ponyCount = inputs[dataId].size()
         / Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
-
     brain.prepareResult(ponyCount);
     brain.learn(wantedResults[dataId]);
     if(!(steps % stepsPerRun) && steps != 0)

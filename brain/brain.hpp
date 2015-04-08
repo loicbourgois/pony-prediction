@@ -20,8 +20,18 @@ class Brain
     void evaluate1();
     void evaluate2();
     void reset();
+    //
     const float & getRatio() const {return ratio;}
     const int & getId() const {return id;}
+    static void setMutationFrequency(const float & ratio){
+      mutexMutationFrequency.lock();
+      mutationFrequency = ratio;
+      mutexMutationFrequency.unlock();}
+    static void setMutationIntensity(const float & ratio){
+      mutexMutationIntensity.lock();
+      mutationIntensity = ratio;
+      mutexMutationIntensity.unlock();}
+    //
   private:
     void copyToBestBrain();
     void copyFromBestBrain();
@@ -40,6 +50,10 @@ class Brain
     static QMutex mutexBestBrainId;
     static QMutex mutexLastNratios;
     static QMutex mutexAverageRatio;
+    static float mutationFrequency;
+    static QMutex mutexMutationFrequency;
+    static float mutationIntensity;
+    static QMutex mutexMutationIntensity;
     QVector<Layer> layers;
     QVector<float> outputs;
     Result result;

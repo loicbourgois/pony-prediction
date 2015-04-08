@@ -29,8 +29,20 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->plainTextEditLogs->setMaximumBlockCount(1000);
   //
   Util::init(this);
-  QObject::connect(this, SIGNAL(newLog(QString)), this->ui->plainTextEditLogs,
-  SLOT(appendPlainText(QString)));
+  QObject::connect(this,
+                   SIGNAL(newLog(QString)),
+                   this->ui->plainTextEditLogs,
+                   SLOT(appendPlainText(QString)));
+  QObject::connect(ui->doubleSpinBoxMutationFrequency,
+                   SIGNAL(valueChanged(double)),
+                   this,
+                   SLOT(onMutationFrequencyChanged(double)));
+  ui->doubleSpinBoxMutationFrequency->setValue(0.005f);
+  QObject::connect(ui->doubleSpinBoxMutationIntensity,
+                   SIGNAL(valueChanged(double)),
+                   this,
+                   SLOT(onMutationIntensityChanged(double)));
+  ui->doubleSpinBoxMutationIntensity->setValue(1.0f);
   //
   simulation.loadRaces(QDate(2013, 01, 1), QDate(2013, 01, 31));
   simulation.prepareData();
@@ -42,4 +54,19 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
   delete ui;
+}
+
+void MainWindow::addLog(const QString & log)
+{
+  emit newLog(log);
+}
+
+void MainWindow::onMutationFrequencyChanged(double value)
+{
+  Brain::setMutationFrequency(value);
+}
+
+void MainWindow::onMutationIntensityChanged(double value)
+{
+  Brain::setMutationIntensity(value);
 }

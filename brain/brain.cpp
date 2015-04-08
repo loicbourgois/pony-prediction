@@ -16,6 +16,10 @@ QMutex Brain::mutexBestBrain;
 QMutex Brain::mutexBestBrainId;
 QMutex Brain::mutexLastNratios;
 QMutex Brain::mutexAverageRatio;
+float Brain::mutationFrequency = 0.000f;
+QMutex Brain::mutexMutationFrequency;
+float Brain::mutationIntensity= 0.000f;
+QMutex Brain::mutexMutationIntensity;
 
 Brain::Brain() :
   layers(),
@@ -132,11 +136,14 @@ void Brain::mutateRandomly()
 void Brain::mutateFromBest()
 {
   copyFromBestBrain();
-  float mutationRatio = (1.0 - ratio);
-  mutationRatio *= mutationRatio;
-  mutationRatio = 0.05;
+  mutexMutationFrequency.lock();
+  float mutationFrequency = Brain::mutationFrequency;
+  mutexMutationFrequency.unlock();
+  mutexMutationIntensity.lock();
+  float mutationIntensity = Brain::mutationIntensity;
+  mutexMutationIntensity.unlock();
   for(int i = 0 ; i < layers.size() ; i++)
-    layers[i].mutate(mutationRatio); // mutationRatio = errorRatio²
+    layers[i].mutate(mutationFrequency, mutationIntensity);
 }
 
 void Brain::evaluate1()
@@ -180,11 +187,8 @@ void Brain::evaluate2()
                  + " : " + QString::number(averagetmp, 'f', 6));
     copyToBestBrain();
   }
-  //else
-  {
-    mutateFromBest();
-    reset();
-  }
+  mutateFromBest();
+  reset();
 }
 
 void Brain::reset()

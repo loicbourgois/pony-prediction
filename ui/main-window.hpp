@@ -13,12 +13,13 @@ class MainWindow : public QMainWindow
   public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-  //public slots:
-    void addLog(const QString & log);
   signals:
     void newLog(const QString & log);
-
+  private slots:
+    void onMutationFrequencyChanged(double value);
+    void onMutationIntensityChanged(double value);
   private:
+    void addLog(const QString & log);
     Ui::MainWindow *ui;
     Simulation simulation;
 };

@@ -82,8 +82,9 @@ void Layer::mutateRandomly()
     neurons[i].mutateRandomly();
 }
 
-void Layer::mutate(const float & mutationRatio)
+void Layer::mutate(const float & mutationFrequency,
+                   const float & mutationIntensity)
 {
   for(int i = 0 ; i < neurons.size() ; i++)
-    neurons[i].mutate(mutationRatio);
+    neurons[i].mutate(mutationFrequency, mutationIntensity);
 }

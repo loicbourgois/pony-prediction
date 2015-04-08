@@ -9,7 +9,7 @@ class Neuron
     ~Neuron();
     void compute(const QVector<float> &inputs);
     void mutateRandomly();
-    void mutate(const float & mutationRatio);
+    void mutate(const float & mutationFrequency, const float & mutationIntensity);
     const float & getOutput() const{return output;}
   private:
     void addWeight();
