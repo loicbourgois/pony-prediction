@@ -134,7 +134,7 @@ void Brain::mutateFromBest()
   copyFromBestBrain();
   float mutationRatio = (1.0 - ratio);
   mutationRatio *= mutationRatio;
-  //mutationRatio = 0.05;
+  mutationRatio = 0.05;
   for(int i = 0 ; i < layers.size() ; i++)
     layers[i].mutate(mutationRatio); // mutationRatio = errorRatio²
 }

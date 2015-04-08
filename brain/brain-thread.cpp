@@ -41,7 +41,7 @@ void BrainThread::run()
     if(!(steps % stepsPerRun) && steps != 0)
     {
       runs++;
-      brain.evaluate1();
+      brain.evaluate2();
     }
     dataId++;
     dataId %= inputs.size();

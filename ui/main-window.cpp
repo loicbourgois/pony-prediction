@@ -26,9 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
   line->setFrameShape(QFrame::VLine);
   line->setFrameShadow(QFrame::Raised);
   layout->addWidget(line);
+  ui->plainTextEditLogs->setMaximumBlockCount(1000);
   //
   Util::init(this);
-  QObject::connect(this, SIGNAL(newLog(QString)), this->ui->textEditLogs, SLOT(append(QString)));
+  QObject::connect(this, SIGNAL(newLog(QString)), this->ui->plainTextEditLogs,
+  SLOT(appendPlainText(QString)));
   //
   simulation.loadRaces(QDate(2013, 01, 1), QDate(2013, 01, 31));
   simulation.prepareData();
