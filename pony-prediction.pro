@@ -23,7 +23,9 @@ SOURCES += \
     brain/layer.cpp \
     core/util.cpp \
     core/result.cpp \
-    brain/brain-thread.cpp
+    brain/brain-thread.cpp \
+    brain/superbrain.cpp \
+    brain/superneuron.cpp
 
 HEADERS  += \
     ui/main-window.hpp \
@@ -35,7 +37,9 @@ HEADERS  += \
     brain/layer.hpp \
     core/util.hpp \
     core/result.hpp \
-    brain/brain-thread.hpp
+    brain/brain-thread.hpp \
+    brain/superbrain.hpp \
+    brain/superneuron.hpp
 
 FORMS    += \
     ui/main-window.ui

@@ -40,7 +40,26 @@ void Neuron::mutateRandomly()
   for(int i = 0 ; i < weights.size() ; i++)
     weights[i] = Util::getRandomFloat(-1.0f, 1.0f);
 }
-
+/**/
+void Neuron::mutate(const float & mutationFrequency,
+                    const float & mutationIntensity)
+{
+  for(int i = 0 ; i < weights.size() ; i++)
+  {
+    if(Util::getRandomFloat(0.0f, 1.0f) < mutationFrequency)
+    {
+      if(Util::getRandomFloat(-1.0f, 1.0f) > 0)
+        weights[i] += mutationIntensity;
+      else
+        weights[i] -= mutationIntensity;
+      if(weights[i] > 1.0f)
+        weights[i] = 1.0f;
+      if(weights[i] < -1.0f)
+        weights[i] = -1.0f;
+    }
+  }
+}
+/*/
 void Neuron::mutate(const float & mutationFrequency,
                     const float & mutationIntensity)
 {
@@ -56,6 +75,7 @@ void Neuron::mutate(const float & mutationFrequency,
     }
   }
 }
+/**/
 
 void Neuron::addWeight()
 {

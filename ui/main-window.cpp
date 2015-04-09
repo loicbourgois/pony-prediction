@@ -3,6 +3,8 @@
 #include <QDate>
 #include <core/util.hpp>
 
+#include <brain/superbrain.hpp>
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -37,17 +39,21 @@ MainWindow::MainWindow(QWidget *parent) :
                    SIGNAL(valueChanged(double)),
                    this,
                    SLOT(onMutationFrequencyChanged(double)));
-  ui->doubleSpinBoxMutationFrequency->setValue(0.005f);
+
   QObject::connect(ui->doubleSpinBoxMutationIntensity,
                    SIGNAL(valueChanged(double)),
                    this,
                    SLOT(onMutationIntensityChanged(double)));
-  ui->doubleSpinBoxMutationIntensity->setValue(1.0f);
+  ui->doubleSpinBoxMutationFrequency->setValue(0.01f);
+  ui->doubleSpinBoxMutationIntensity->setValue(0.05f);
   //
-  simulation.loadRaces(QDate(2013, 01, 1), QDate(2013, 01, 31));
+  simulation.loadRaces(QDate(2013, 01, 1), QDate(2013, 1, 31));
   simulation.prepareData();
   simulation.loadBrains(5, 3, 20);
-  simulation.start();
+
+  SuperBrain a(20 * 2, 20, 3);
+
+  //simulation.start();
 
 }
 
