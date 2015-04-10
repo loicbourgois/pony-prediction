@@ -7,12 +7,16 @@ class Neuron
   public:
     Neuron();
     ~Neuron();
-    void compute(const QVector<float> &inputs);
-    void mutateRandomly();
-    void mutate(const float & mutationFrequency, const float & mutationIntensity);
-    const float & getOutput() const{return output;}
+    void addExternalInput(float * input);
+    void addNeuronalInput(float * input);
+    void addWeight(float * weight);
+    void compute();
+    float getOutput(){return output;}
+    float * getOutputAdress(){return &output;}
   private:
-    void addWeight();
-    QVector<float> weights;
+    QVector<float *> externalInputs;
+    QVector<float *> neuronalInputs; // = outputs from neuron
+    QVector<float *> brainalInputs; // = outputs from brain
+    QVector<float *> weights; // = outputs from brain
     float output;
 };

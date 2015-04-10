@@ -13,9 +13,10 @@ BrainThread::BrainThread(const int &layerCount,
   go(false),
   inputs(inputs),
   wantedResults(wantedResults),
-  brain(layerCount, neuronsPerLayer, inputsPerNeuronFirstLayer),
+  brain(20*4, 20, 4, 20),
   seed(seed)
 {
+
 }
 
 BrainThread::~BrainThread()
@@ -32,6 +33,7 @@ void BrainThread::run()
   int runs = 0;
   while(go)
   {
+    //qDebug() << steps;
     brain.compute(inputs[dataId]);
     int ponyCount = inputs[dataId].size()
         / Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
@@ -40,7 +42,7 @@ void BrainThread::run()
     if(!(steps % stepsPerRun) && steps != 0)
     {
       runs++;
-      brain.evaluate2();
+      brain.evaluate();
     }
     dataId++;
     dataId %= inputs.size();

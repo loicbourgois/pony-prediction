@@ -1,28 +1,53 @@
 #pragma once
 
+#include <QVector>
 #include <QMutex>
-#include "layer.hpp"
+#include "brain/neuron.hpp"
 #include "core/result.hpp"
 
 class Brain
 {
   public:
-    Brain();
-    Brain(const int &layerCount,
-          const int &neuronsPerLayer,
-          const int & inputsPerNeuron);
+
+    Brain(const int & inputsCount,
+          const int & neuronsPerLayer,
+          const int & layersCount,
+          const int & outputsCount);
     ~Brain();
-    void compute(const QVector<float> &inputs);
-    void learn(const Result & wantedResult);
+
+    void compute(const QVector<float> & inputs);
     void prepareResult(const int & ponyCount);
-    void mutateRandomly();
+    void learn(const Result & wantedResult);
+    void evaluate();
     void mutateFromBest();
-    void evaluate1();
-    void evaluate2();
-    void reset();
-    //
-    const float & getRatio() const {return ratio;}
-    const int & getId() const {return id;}
+
+  private:
+
+    void initRandom();
+    void initNeurons();
+    void initExternalInputs();
+    void initNeuronalInputs();
+    void initWeights();
+
+    int id;
+
+    int inputsCount;
+    int neuronsPerLayer;
+    int layersCount;
+    int outputsCount;
+
+    QVector<float> weights;
+    QVector<float> outputs;
+    QVector<Neuron> neurons;
+    QVector<float> inputs;
+
+    Result result;
+    float score;
+    int attempts;
+    float ratio;
+
+  public:
+
     static void setMutationFrequency(const float & ratio){
       mutexMutationFrequency.lock();
       mutationFrequency = ratio;
@@ -31,37 +56,24 @@ class Brain
       mutexMutationIntensity.lock();
       mutationIntensity = ratio;
       mutexMutationIntensity.unlock();}
-    //
+
   private:
-    void copyToBestBrain();
-    void copyFromBestBrain();
-    static void addRatio(const float & ratio);
+
+    void saveToBestBrain();
+    void loadFromBestBrain();
+
+    static void addRatioToAverage(const float & ratio);
     static void updateAverageRatio();
     static int idCount;
-    static float mutationRatio;
     static int ratiosToSaveCount;
-    static float bestRatio;
     static Brain bestBrain;
-    static int bestBrainId;
-    static QVector<float> lastNratios;
     static float averageRatio;
-    static QMutex mutexBestRatio;
-    static QMutex mutexBestBrain;
-    static QMutex mutexBestBrainId;
-    static QMutex mutexLastNratios;
-    static QMutex mutexAverageRatio;
+    static QVector<float> lastNratios;
     static float mutationFrequency;
-    static QMutex mutexMutationFrequency;
     static float mutationIntensity;
+    static QMutex mutexBestBrain;
+    static QMutex mutexAverageRatio;
+    static QMutex mutexLastNratios;
+    static QMutex mutexMutationFrequency;
     static QMutex mutexMutationIntensity;
-    QVector<Layer> layers;
-    QVector<float> outputs;
-    Result result;
-    int score;
-    int attempts;
-    float ratio;
-    int id;
-    int neuronsPerLayer;
-    int inputsPerNeuron;
-
 };

@@ -18,28 +18,22 @@ SOURCES += \
     core/simulation.cpp \
     core/race.cpp \
     core/pony.cpp \
-    brain/brain.cpp \
-    brain/neuron.cpp \
-    brain/layer.cpp \
     core/util.cpp \
     core/result.cpp \
     brain/brain-thread.cpp \
-    brain/superbrain.cpp \
-    brain/superneuron.cpp
+    brain/brain.cpp \
+    brain/neuron.cpp
 
 HEADERS  += \
     ui/main-window.hpp \
     core/simulation.hpp \
     core/race.hpp \
     core/pony.hpp \
-    brain/brain.hpp \
-    brain/neuron.hpp \
-    brain/layer.hpp \
     core/util.hpp \
     core/result.hpp \
     brain/brain-thread.hpp \
-    brain/superbrain.hpp \
-    brain/superneuron.hpp
+    brain/brain.hpp \
+    brain/neuron.hpp
 
 FORMS    += \
     ui/main-window.ui

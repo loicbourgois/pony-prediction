@@ -1,11 +1,7 @@
 #include "neuron.hpp"
 #include <QDebug>
-#include <math.h>
-#include "core/util.hpp"
 
-Neuron::Neuron() :
-  weights(),
-  output(0.0f)
+Neuron::Neuron()
 {
 
 }
@@ -15,69 +11,36 @@ Neuron::~Neuron()
 
 }
 
-void Neuron::compute(const QVector<float> & inputs)
+void Neuron::addExternalInput(float * input)
+{
+  externalInputs.push_back(input);
+}
+
+void Neuron::addNeuronalInput(float * input)
+{
+  neuronalInputs.push_back(input);
+}
+
+void Neuron::addWeight(float * weight)
+{
+  weights.push_back(weight);
+}
+
+void Neuron::compute()
 {
   float absoluteWeight = 0.0f;
   output = 0.0f;
+  QVector<float*> inputs = externalInputs + neuronalInputs + brainalInputs;
   for(int i = 0 ; i < inputs.size() ; i++)
   {
-    if(weights.size() <= i )
-      addWeight();
-    if(!(inputs[i] <= 1 && inputs[i] >= -1))
-      qDebug() << "Inputs value out of range [-1;1] : " << inputs[i];
-    if(!(weights[i] <= 1 && weights[i] >= -1))
-      qDebug() << "Inputs value out of range [-1;1] : " << inputs[i];
-    output += inputs[i] * weights[i];
-    absoluteWeight += fabs(weights[i]);
+    /*if(!((*inputs[i]) <= 1 && (*inputs[i]) >= -1))
+      qDebug() << "Inputs value out of range [-1;1] : " << (*inputs[i]);
+    if(!((*weights[i]) <= 1 && (*weights[i]) >= -1))
+      qDebug() << "Weight value out of range [-1;1] : " << (*weights[i]);*/
+    output += (*inputs[i]) * (*weights[i]);
+    absoluteWeight += fabs(*weights[i]);
   }
   output /= absoluteWeight;
-  if(!(output <= 1 && output >= -1))
-    qDebug() << "Output value out of range [-1;1] : " << output;
-}
-
-void Neuron::mutateRandomly()
-{
-  for(int i = 0 ; i < weights.size() ; i++)
-    weights[i] = Util::getRandomFloat(-1.0f, 1.0f);
-}
-/**/
-void Neuron::mutate(const float & mutationFrequency,
-                    const float & mutationIntensity)
-{
-  for(int i = 0 ; i < weights.size() ; i++)
-  {
-    if(Util::getRandomFloat(0.0f, 1.0f) < mutationFrequency)
-    {
-      if(Util::getRandomFloat(-1.0f, 1.0f) > 0)
-        weights[i] += mutationIntensity;
-      else
-        weights[i] -= mutationIntensity;
-      if(weights[i] > 1.0f)
-        weights[i] = 1.0f;
-      if(weights[i] < -1.0f)
-        weights[i] = -1.0f;
-    }
-  }
-}
-/*/
-void Neuron::mutate(const float & mutationFrequency,
-                    const float & mutationIntensity)
-{
-  for(int i = 0 ; i < weights.size() ; i++)
-  {
-    if(Util::getRandomFloat(0.0f, 1.0f) < mutationFrequency)
-    {
-      weights[i] += Util::getRandomFloat(-mutationIntensity, mutationIntensity);
-      if(weights[i] > 1.0f)
-        weights[i] = 1.0f;
-      if(weights[i] < -1.0f)
-        weights[i] = -1.0f;
-    }
-  }
-}
-/**/
-
-void Neuron::addWeight()
-{
-  weights.push_back(Util::getRandomFloat(-1.0f, 1.0f));
+  /*if(!(output <= 1 && output >= -1))
+    qDebug() << "Output value out of range [-1;1] : " << output;*/
 }

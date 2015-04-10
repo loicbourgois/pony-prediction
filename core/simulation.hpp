@@ -2,7 +2,6 @@
 
 #include <QDate>
 #include "race.hpp"
-#include "brain/brain.hpp"
 #include <QThread>
 #include "brain/brain-thread.hpp"
 

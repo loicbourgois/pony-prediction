@@ -1,181 +1,106 @@
 #include "brain.hpp"
-#include <QDebug>
 #include "core/util.hpp"
-#include "core/simulation.hpp"
+
+#include <QDebug>
 
 int Brain::idCount = 0;
-float Brain::mutationRatio = 0.5f;
-int Brain::ratiosToSaveCount = 10;
-float Brain::bestRatio = -1.0f;
-Brain Brain::bestBrain;
-int Brain::bestBrainId = -1;
-QVector<float> Brain::lastNratios;
-float Brain::averageRatio = -1.0f;
-QMutex Brain::mutexBestRatio;
+int Brain::ratiosToSaveCount = 100;
+Brain Brain::bestBrain(1,1,1,1);
+float Brain::averageRatio = 0.0f;
+QVector<float> Brain::lastNratios = QVector<float>(100, 0.0f);
+float Brain::mutationFrequency = 0.0f;
+float Brain::mutationIntensity = 0.0f;
 QMutex Brain::mutexBestBrain;
-QMutex Brain::mutexBestBrainId;
-QMutex Brain::mutexLastNratios;
 QMutex Brain::mutexAverageRatio;
-float Brain::mutationFrequency = 0.000f;
+QMutex Brain::mutexLastNratios;
 QMutex Brain::mutexMutationFrequency;
-float Brain::mutationIntensity= 0.000f;
 QMutex Brain::mutexMutationIntensity;
 
-Brain::Brain() :
-  layers(),
-  outputs(),
-  result(),
-  score(0),
-  attempts(0),
-  ratio(0),
-  id()
-{
-  id = idCount;
-  idCount++;
-}
-
-Brain::Brain(const int & layerCount,
+Brain::Brain(const int & inputsCount,
              const int & neuronsPerLayer,
-             const int & inputsPerNeuron) :
-  Brain()
+             const int & layersCount,
+             const int & outputsCount) :
+  id(-1),
+  inputsCount(inputsCount),
+  neuronsPerLayer(neuronsPerLayer),
+  layersCount(layersCount),
+  outputsCount(outputsCount),
+  weights(),
+  outputs(),
+  neurons(),
+  inputs(),
+  result(),
+  score(0.0f),
+  attempts(0),
+  ratio(0.0f)
 {
-  this->neuronsPerLayer = neuronsPerLayer;
-  this->inputsPerNeuron = inputsPerNeuron;
-  /*for(int i = 0 ; i < layerCount ; i++)
-  {
-    layers.push_back(Layer(neuronsPerLayer));
-  }*/
-  layers.push_back(Layer(neuronsPerLayer/*, inputsPerNeuron*/));
-  for(int i = 1 ; i < layerCount ; i++)
-  {
-    layers.push_back(Layer(neuronsPerLayer));
-  }
-  copyToBestBrain();
+  initRandom();
+  initNeurons();
+  initExternalInputs();
+  initNeuronalInputs();
+  initWeights();
+
+
+  saveToBestBrain();
 }
 
 Brain::~Brain()
 {
-}
 
-/*void Brain::compute(const QVector<float> & inputs)
-{
-  int ponyCount = inputs.size()
-      / (int)Simulation::INPUTS_PER_NEURON_FIRST_LAYER;
-  layers[0].compute(inputs);
-  QVector<float> inputstmp;
-  QVector<float> outputstmp;
-  for(int i = 1 ; i < layers.size() ; i++)
-  {
-    outputstmp = layers[i-1].getOutputs();
-    inputstmp.clear();
-    for(int j = 0 ; j < ponyCount ; j++)
-    {
-      for(int k = 0 ; k < inputsPerNeuron ; k++)
-      {
-        inputstmp.push_back(inputs[j*inputsPerNeuron+k]);
-      }
-      inputstmp.push_back(outputstmp[j]);
-    }
-    layers[i].compute(inputstmp);
-  }
-  outputs = layers[layers.size()-1].getOutputs();
-  attempts++;
-}*/
+}
 
 void Brain::compute(const QVector<float> & inputs)
 {
-  layers[0].compute(inputs);
-  for(int i = 1 ; i < layers.size() ; i++)
+  for(int i = 0 ; i < this->inputs.size() ; i++)
+    this->inputs[i] = 0.0f;
+  for(int i = 0 ; i < inputs.size() && i < this->inputs.size() ; i++)
+    this->inputs[i] = inputs[i];
+  for(int i = 0 ; i < neurons.size() ; i++)
+    neurons[i].compute();
+  for(int i = 0 ; i < outputsCount ; i++)
   {
-    layers[i].compute(layers[i-1].getOutputs());
+    int i2 = (neurons.size() - outputs.size()) + i;
+    outputs[i] = neurons[i2].getOutput();
   }
-  outputs = layers[layers.size()-1].getOutputs();
-  attempts++;
-}
-
-void Brain::learn(const Result &wantedResult)
-{
-  if(result.get(0) == wantedResult.get(0))
-  {
-    score += 1;
-  }
-  ratio = (float)score /  (float)attempts;
 }
 
 void Brain::prepareResult(const int & ponyCount)
 {
-  QVector<int> orderOnarrival;
-  QVector<float> arrivee;
+  QVector<int> arrivalOrder;
+  QVector<float> arrivalDisorder;
   for(int i = 0 ; i < ponyCount ; i++)
-    arrivee.push_back(outputs[i]);
-  int tmp = arrivee.size();
+    arrivalDisorder.push_back(outputs[i]);
+  int tmp = arrivalDisorder.size();
   for(int i = 0 ; i<tmp ; i++)
   {
     int bestId = 0;
     int bestRatio = 0.0f;
-    for(int j = 0 ; j<arrivee.size(); j++)
+    for(int j = 0 ; j<arrivalDisorder.size(); j++)
     {
-      if(arrivee[j] > bestRatio)
+      if(arrivalDisorder[j] > bestRatio)
       {
         bestId = j;
-        bestRatio = arrivee[j];
+        bestRatio = arrivalDisorder[j];
       }
     }
-    orderOnarrival.push_back(bestId);
-    arrivee.remove(bestId);
+    arrivalOrder.push_back(bestId);
+    arrivalDisorder.remove(bestId);
   }
-  result = Result(orderOnarrival);
+  result = Result(arrivalOrder);
 }
 
-void Brain::mutateRandomly()
+void Brain::learn(const Result & wantedResult)
 {
-  for(int i = 0 ; i < layers.size() ; i++)
-    layers[i].mutateRandomly();
+  attempts++;
+  if(result.get(0) == wantedResult.get(0))
+    score += 1.0f;
+  ratio = score /  (float)attempts;
 }
 
-void Brain::mutateFromBest()
-{
-  copyFromBestBrain();
-  mutexMutationFrequency.lock();
-  float mutationFrequency = Brain::mutationFrequency;
-  mutexMutationFrequency.unlock();
-  mutexMutationIntensity.lock();
-  float mutationIntensity = Brain::mutationIntensity;
-  mutexMutationIntensity.unlock();
-  for(int i = 0 ; i < layers.size() ; i++)
-    layers[i].mutate(mutationFrequency, mutationIntensity);
-}
-
-void Brain::evaluate1()
+void Brain::evaluate()
 {
   // Calculate average ratio
-  addRatio(ratio);
-  updateAverageRatio();
-  //
-  mutexBestRatio.lock();
-  bool isBest = (ratio > bestRatio);
-  mutexBestRatio.unlock();
-  if(isBest)
-  {
-    mutexAverageRatio.lock();
-    Util::addLog("Brain " + QString::number(id)
-                 + " : " + QString::number(ratio, 'f', 6)
-                 + " : " + QString::number(averageRatio, 'f', 6));
-    mutexAverageRatio.unlock();
-    mutexBestRatio.lock();
-    bestRatio = ratio;
-    mutexBestRatio.unlock();
-    copyToBestBrain();
-  }
-  mutateFromBest();
-  reset();
-}
-
-void Brain::evaluate2()
-{
-  // Calculate average ratio
-  addRatio(ratio);
-  updateAverageRatio();
+  addRatioToAverage(ratio);
   // Evaluate if best brain or not
   mutexAverageRatio.lock();
   float averagetmp = averageRatio;
@@ -185,52 +110,171 @@ void Brain::evaluate2()
     Util::addLog("Brain " + QString::number(id)
                  + " : " + QString::number(ratio, 'f', 6)
                  + " : " + QString::number(averagetmp, 'f', 6));
-    copyToBestBrain();
+    saveToBestBrain();
   }
   mutateFromBest();
-  reset();
 }
 
-void Brain::reset()
+void Brain::mutateFromBest()
 {
-  outputs.clear();
-  result = Result();
-  score = 0;
-  attempts = 0;
-  ratio = 0;
+  loadFromBestBrain();
+  mutexMutationFrequency.lock();
+  float mutationFrequency = Brain::mutationFrequency;
+  mutexMutationFrequency.unlock();
+  mutexMutationIntensity.lock();
+  float mutationIntensity = Brain::mutationIntensity;
+  mutexMutationIntensity.unlock();
+  for(int i = 0 ; i < weights.size() ; i++)
+  {
+    if(Util::getRandomFloat(0.0f, 1.0f) < mutationFrequency)
+    {
+      if(Util::getRandomFloat(-1.0f, 1.0f) > 0)
+        weights[i] += mutationIntensity;
+      else
+        weights[i] -= mutationIntensity;
+      if(weights[i] > 1.0f)
+        weights[i] = 1.0f;
+      if(weights[i] < -1.0f)
+        weights[i] = -1.0f;
+    }
+  }
 }
 
-void Brain::copyToBestBrain()
+/*******************************************************************************
+* Inits
+*******************************************************************************/
+
+void Brain::initRandom()
+{
+  id = idCount;
+  idCount++;
+  inputs = QVector<float>(inputsCount, 0.0f);
+  int w = inputsCount / neuronsPerLayer
+      + neuronsPerLayer * neuronsPerLayer * (layersCount-1);
+  weights.clear();
+  for(int i = 0 ; i < w ; i++)
+    weights.push_back(Util::getRandomFloat(0.0f, 1.0f));
+  outputs = QVector<float>(outputsCount, 0.0f);
+}
+
+void Brain::initNeurons()
+{
+  neurons.clear();
+  for(int i = 0 ; i < neuronsPerLayer * layersCount ; i++)
+    neurons.push_back(Neuron());
+}
+
+void Brain::initExternalInputs()
+{
+  int inPerNeur = inputsCount / neuronsPerLayer;
+  for(int i = 0 ; i < neuronsPerLayer ; i++)
+  {
+    for(int j = 0 ; j < inPerNeur ; j++)
+    {
+      neurons[i].addExternalInput(&inputs[i*inPerNeur + j]);
+    }
+  }
+}
+
+void Brain::initNeuronalInputs()
+{
+  for(int i = 1 ; i < layersCount ; i++)
+  {
+    for(int j = 0 ; j < neuronsPerLayer ; j++)
+    {
+      int id = i*neuronsPerLayer + j;
+      for(int k = 0 ; k < neuronsPerLayer ; k++)
+      {
+        int id2 = (i-1)*neuronsPerLayer + k;
+        neurons[id].addNeuronalInput(neurons[id2].getOutputAdress());
+      }
+    }
+  }
+}
+
+void Brain::initWeights()
+{
+  // First layer : same weights for all
+  int inPerNeur = inputsCount / neuronsPerLayer;
+  for(int i = 0 ; i < neuronsPerLayer ; i++)
+  {
+    for(int j = 0 ; j < inPerNeur ; j++)
+    {
+      neurons[i].addWeight(&weights[j]);
+    }
+  }
+  // Other layers : unique weights
+  for(int i = 1 ; i < layersCount ; i++)
+  {
+    for(int j = 0 ; j < neuronsPerLayer ; j++)
+    {
+      int id = i*neuronsPerLayer + j;
+      for(int k = 0 ; k < neuronsPerLayer ; k++)
+      {
+        int id2 = inPerNeur
+            + (i-1)*neuronsPerLayer*neuronsPerLayer
+            + j*neuronsPerLayer
+            + k;
+        neurons[id].addWeight(&weights[id2]);
+      }
+    }
+  }
+}
+
+/*******************************************************************************
+* Statics
+*******************************************************************************/
+
+void Brain::saveToBestBrain()
 {
   mutexBestBrain.lock();
-  bestBrain.layers = layers;
-  bestBrain.outputs = outputs;
-  bestBrain.result = result;
+  bestBrain.id = 0;
+  bestBrain.inputsCount = inputsCount;
+  bestBrain.neuronsPerLayer = neuronsPerLayer;
+  bestBrain.layersCount = layersCount;
+  bestBrain.outputsCount = outputsCount;
+  bestBrain.weights = weights;
+  bestBrain.outputs = QVector<float>(outputsCount, 0.0f);
+  bestBrain.neurons = QVector<Neuron>();
+  bestBrain.inputs = QVector<float>(inputsCount, 0.0f);
+  bestBrain.result = Result();
   bestBrain.score = score;
   bestBrain.attempts = attempts;
   bestBrain.ratio = ratio;
   mutexBestBrain.unlock();
 }
 
-void Brain::copyFromBestBrain()
+void Brain::loadFromBestBrain()
 {
   mutexBestBrain.lock();
-  layers = bestBrain.layers;
-  outputs = bestBrain.outputs;
-  result = bestBrain.result;
-  score = bestBrain.score;
-  attempts = bestBrain.attempts;
-  ratio = bestBrain.ratio;
+  id = id;
+  inputsCount = bestBrain.inputsCount;
+  neuronsPerLayer = bestBrain.neuronsPerLayer;
+  layersCount = bestBrain.layersCount;
+  outputsCount = bestBrain.outputsCount;
+  weights = bestBrain.weights;
+  outputs = QVector<float>(outputsCount, 0.0f);
+  neurons = QVector<Neuron>();
+  inputs = QVector<float>(inputsCount, 0.0f);
+  result = Result();
+  score = 0;
+  attempts = 0;
+  ratio = 0;
   mutexBestBrain.unlock();
+  initNeurons();
+  initExternalInputs();
+  initNeuronalInputs();
+  initWeights();
 }
 
-void Brain::addRatio(const float & ratio)
+void Brain::addRatioToAverage(const float & ratio)
 {
   mutexLastNratios.lock();
   lastNratios.push_back(ratio);
   while(lastNratios.size() > ratiosToSaveCount)
     lastNratios.pop_front();
   mutexLastNratios.unlock();
+  updateAverageRatio();
 }
 
 void Brain::updateAverageRatio()
