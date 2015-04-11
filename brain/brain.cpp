@@ -26,22 +26,26 @@ Brain::Brain(const int & inputsCount,
   layersCount(layersCount),
   outputsCount(outputsCount),
   weights(),
-  outputs(),
-  neurons(),
   inputs(),
+  outputs(),
+  neuronBlueprints(),
+  neurons(),
   result(),
   score(0.0f),
   attempts(0),
   ratio(0.0f)
 {
-  initRandom();
+  id = idCount;
+  idCount++;
+  inputs = QVector<float>(inputsCount, 0.0f);
+  int w = inputsCount / neuronsPerLayer
+      + neuronsPerLayer * neuronsPerLayer * (layersCount-1);
+  weights.clear();
+  for(int i = 0 ; i < w ; i++)
+    weights.push_back(Util::getRandomFloat(0.0f, 1.0f));
+  outputs = QVector<float>(outputsCount, 0.0f);
+  initBlueprints();
   initNeurons();
-  initExternalInputs();
-  initNeuronalInputs();
-  initWeights();
-
-
-  saveToBestBrain();
 }
 
 Brain::~Brain()
@@ -144,40 +148,23 @@ void Brain::mutateFromBest()
 * Inits
 *******************************************************************************/
 
-void Brain::initRandom()
+void Brain::initBlueprints()
 {
-  id = idCount;
-  idCount++;
-  inputs = QVector<float>(inputsCount, 0.0f);
-  int w = inputsCount / neuronsPerLayer
-      + neuronsPerLayer * neuronsPerLayer * (layersCount-1);
-  weights.clear();
-  for(int i = 0 ; i < w ; i++)
-    weights.push_back(Util::getRandomFloat(0.0f, 1.0f));
-  outputs = QVector<float>(outputsCount, 0.0f);
-}
-
-void Brain::initNeurons()
-{
-  neurons.clear();
+  //
+  neuronBlueprints.clear();
   for(int i = 0 ; i < neuronsPerLayer * layersCount ; i++)
-    neurons.push_back(Neuron());
-}
-
-void Brain::initExternalInputs()
-{
+    neuronBlueprints.push_back(NeuronBlueprint());
+  // External inputs
   int inPerNeur = inputsCount / neuronsPerLayer;
-  for(int i = 0 ; i < neuronsPerLayer ; i++)
+  for(int id = 0 ; id < neuronsPerLayer ; id++)
   {
     for(int j = 0 ; j < inPerNeur ; j++)
     {
-      neurons[i].addExternalInput(&inputs[i*inPerNeur + j]);
+      int id2 = id*inPerNeur + j;
+      neuronBlueprints[id].addExternalInputId(id2);
     }
   }
-}
-
-void Brain::initNeuronalInputs()
-{
+  // Neuronal inputs
   for(int i = 1 ; i < layersCount ; i++)
   {
     for(int j = 0 ; j < neuronsPerLayer ; j++)
@@ -186,24 +173,19 @@ void Brain::initNeuronalInputs()
       for(int k = 0 ; k < neuronsPerLayer ; k++)
       {
         int id2 = (i-1)*neuronsPerLayer + k;
-        neurons[id].addNeuronalInput(neurons[id2].getOutputAdress());
+        neuronBlueprints[id].addNeuronalInputId(id2);
       }
     }
   }
-}
-
-void Brain::initWeights()
-{
-  // First layer : same weights for all
-  int inPerNeur = inputsCount / neuronsPerLayer;
-  for(int i = 0 ; i < neuronsPerLayer ; i++)
+  // Weights : first layer : same for all
+  for(int id = 0 ; id < neuronsPerLayer ; id++)
   {
-    for(int j = 0 ; j < inPerNeur ; j++)
+    for(int id2 = 0 ; id2 < inPerNeur ; id2++)
     {
-      neurons[i].addWeight(&weights[j]);
+      neuronBlueprints[id].addWeightId(id2);
     }
   }
-  // Other layers : unique weights
+  // Weights : others layer : unique for all
   for(int i = 1 ; i < layersCount ; i++)
   {
     for(int j = 0 ; j < neuronsPerLayer ; j++)
@@ -215,8 +197,45 @@ void Brain::initWeights()
             + (i-1)*neuronsPerLayer*neuronsPerLayer
             + j*neuronsPerLayer
             + k;
-        neurons[id].addWeight(&weights[id2]);
+        neuronBlueprints[id].addWeightId(id2);
       }
+    }
+  }
+}
+
+void Brain::initNeurons()
+{
+  //
+  neurons.clear();
+  for(int i = 0 ; i < neuronsPerLayer * layersCount ; i++)
+  {
+    neurons.push_back(Neuron());
+  }
+  //
+  for(int i = 0 ; i < neurons.size() ; i++)
+  {
+    NeuronBlueprint blueprint = neuronBlueprints[i];
+    for(int j = 0 ;
+        j < blueprint.externalInputIds.size() ;
+        j++)
+    {
+      float * a = &inputs[blueprint.externalInputIds[j]];
+      neurons[i].addExternalInput(a);
+    }
+    for(int j = 0 ;
+        j < blueprint.neuronalInputIds.size() ;
+        j++)
+    {
+      float * a = neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
+      neurons[i].addNeuronalInput(a);
+    }
+
+    for(int j = 0 ;
+        j < blueprint.weightIds.size() ;
+        j++)
+    {
+      float * a = &weights[blueprint.weightIds[j]];
+      neurons[i].addWeight(a);
     }
   }
 }
@@ -237,6 +256,7 @@ void Brain::saveToBestBrain()
   bestBrain.outputs = QVector<float>(outputsCount, 0.0f);
   bestBrain.neurons = QVector<Neuron>();
   bestBrain.inputs = QVector<float>(inputsCount, 0.0f);
+  bestBrain.neuronBlueprints = neuronBlueprints;
   bestBrain.result = Result();
   bestBrain.score = score;
   bestBrain.attempts = attempts;
@@ -256,15 +276,13 @@ void Brain::loadFromBestBrain()
   outputs = QVector<float>(outputsCount, 0.0f);
   neurons = QVector<Neuron>();
   inputs = QVector<float>(inputsCount, 0.0f);
+  neuronBlueprints = bestBrain.neuronBlueprints;
   result = Result();
   score = 0;
   attempts = 0;
   ratio = 0;
   mutexBestBrain.unlock();
   initNeurons();
-  initExternalInputs();
-  initNeuronalInputs();
-  initWeights();
 }
 
 void Brain::addRatioToAverage(const float & ratio)

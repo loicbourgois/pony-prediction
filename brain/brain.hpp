@@ -3,6 +3,7 @@
 #include <QVector>
 #include <QMutex>
 #include "brain/neuron.hpp"
+#include "brain/neuron-blueprint.hpp"
 #include "core/result.hpp"
 
 class Brain
@@ -23,11 +24,9 @@ class Brain
 
   private:
 
-    void initRandom();
+    void init();
+    void initBlueprints();
     void initNeurons();
-    void initExternalInputs();
-    void initNeuronalInputs();
-    void initWeights();
 
     int id;
 
@@ -37,9 +36,10 @@ class Brain
     int outputsCount;
 
     QVector<float> weights;
-    QVector<float> outputs;
-    QVector<Neuron> neurons;
     QVector<float> inputs;
+    QVector<float> outputs;
+    QVector<NeuronBlueprint> neuronBlueprints;
+    QVector<Neuron> neurons;
 
     Result result;
     float score;

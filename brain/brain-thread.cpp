@@ -33,7 +33,6 @@ void BrainThread::run()
   int runs = 0;
   while(go)
   {
-    //qDebug() << steps;
     brain.compute(inputs[dataId]);
     int ponyCount = inputs[dataId].size()
         / Simulation::INPUTS_PER_NEURON_FIRST_LAYER;

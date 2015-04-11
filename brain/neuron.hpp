@@ -17,6 +17,6 @@ class Neuron
     QVector<float *> externalInputs;
     QVector<float *> neuronalInputs; // = outputs from neuron
     QVector<float *> brainalInputs; // = outputs from brain
-    QVector<float *> weights; // = outputs from brain
+    QVector<float *> weights; // = weights
     float output;
 };
