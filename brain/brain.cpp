@@ -1,7 +1,8 @@
 #include "brain.hpp"
-#include "core/util.hpp"
-
 #include <QDebug>
+#include <QFile>
+#include <QXmlStreamWriter>
+#include "core/util.hpp"
 
 int Brain::idCount = 0;
 int Brain::ratiosToSaveCount = 100;
@@ -141,6 +142,47 @@ void Brain::mutateFromBest()
       if(weights[i] < -1.0f)
         weights[i] = -1.0f;
     }
+  }
+}
+
+void Brain::save(const QString & path)
+{
+  bool ok = true;
+  QString error = "";
+  QFile file(path);
+  if (ok && !file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
+    ok = false;
+    error = "Can't open";
+  }
+  if(ok)
+  {
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+    xml.writeStartElement("brain");
+    {
+      xml.writeTextElement("ratio", QString::number(ratio));
+      xml.writeTextElement("neurons-count",
+                           QString::number(neuronBlueprints.size()));
+      xml.writeTextElement("weights-count",
+                           QString::number(weights.size()));
+      QString weightsStr = QString::number(weights[0], 'f', 6);
+      for(int i = 1 ; i < weights.size() ;  i++)
+        weightsStr += ";" + QString::number(weights[i], 'f', 6);
+      xml.writeTextElement("weights", weightsStr);
+      xml.writeStartElement("neurons");
+      {
+        for(int i = 0 ; i < neuronBlueprints.size() ;  i++)
+        {
+          neuronBlueprints[i].writeToXML(xml);
+        }
+      }
+      xml.writeEndElement();
+    }
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    file.close();
   }
 }
 

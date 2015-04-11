@@ -24,7 +24,7 @@ class Brain
 
   private:
 
-    void init();
+    void save(const QString & path);
     void initBlueprints();
     void initNeurons();
 
@@ -56,6 +56,11 @@ class Brain
       mutexMutationIntensity.lock();
       mutationIntensity = ratio;
       mutexMutationIntensity.unlock();}
+    static void saveBestBrain(const QString & path){
+      mutexBestBrain.lock();
+      bestBrain.save(path);
+      mutexBestBrain.unlock();
+    }
 
   private:
 

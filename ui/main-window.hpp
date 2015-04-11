@@ -18,8 +18,10 @@ class MainWindow : public QMainWindow
   private slots:
     void onMutationFrequencyChanged(double value);
     void onMutationIntensityChanged(double value);
+    void onSaveBestBrain();
   private:
     void addLog(const QString & log);
     Ui::MainWindow *ui;
     Simulation simulation;
+    QString pathToBestBrain;
 };

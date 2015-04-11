@@ -7,7 +7,8 @@
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
-  simulation()
+  simulation(),
+  pathToBestBrain("C:/Users/Loic/pony-prediction/saves/best.brain")
 {
   //
   ui->setupUi(this);
@@ -43,6 +44,10 @@ MainWindow::MainWindow(QWidget *parent) :
                    SIGNAL(valueChanged(double)),
                    this,
                    SLOT(onMutationIntensityChanged(double)));
+  QObject::connect(ui->pushButtonSaveBestBrain,
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(onSaveBestBrain()));
   ui->doubleSpinBoxMutationFrequency->setValue(0.2f);
   ui->doubleSpinBoxMutationIntensity->setValue(0.2f);
   //
@@ -70,4 +75,9 @@ void MainWindow::onMutationFrequencyChanged(double value)
 void MainWindow::onMutationIntensityChanged(double value)
 {
   Brain::setMutationIntensity(value);
+}
+
+void MainWindow::onSaveBestBrain()
+{
+  Brain::saveBestBrain(pathToBestBrain);
 }

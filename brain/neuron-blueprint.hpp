@@ -1,12 +1,16 @@
 #pragma once
 
 #include <QVector>
+#include <QXmlStreamWriter>
 
 class NeuronBlueprint
 {
   public:
     NeuronBlueprint();
     ~NeuronBlueprint();
+
+    void writeToXML(QXmlStreamWriter & xml);
+
     void addExternalInputId(const int & inputId){
       externalInputIds.push_back(inputId);}
     void addNeuronalInputId(const int &  inputId){

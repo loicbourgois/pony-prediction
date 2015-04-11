@@ -58,6 +58,13 @@
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButtonStart">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QWidget" name="widget" native="true">
            <layout class="QGridLayout" name="gridLayout_3">
@@ -151,10 +158,10 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="pushButtonStart">
+         <item row="2" column="0">
+          <widget class="QPushButton" name="pushButtonSaveBestBrain">
            <property name="text">
-            <string>Start</string>
+            <string>Save Best Brain</string>
            </property>
           </widget>
          </item>

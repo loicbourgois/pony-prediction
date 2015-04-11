@@ -13,7 +13,10 @@ BrainThread::BrainThread(const int &layerCount,
   go(false),
   inputs(inputs),
   wantedResults(wantedResults),
-  brain(20*4, 20, 4, 20),
+  brain(neuronsPerLayer*Simulation::INPUTS_PER_NEURON_FIRST_LAYER,
+        neuronsPerLayer,
+        layerCount,
+        neuronsPerLayer),
   seed(seed)
 {
 
