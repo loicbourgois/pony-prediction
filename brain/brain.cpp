@@ -34,7 +34,8 @@ Brain::Brain(const int & inputsCount,
   result(),
   score(0.0f),
   attempts(0),
-  ratio(0.0f)
+  ratio(0.0f),
+  neuronsCount(neuronsPerLayer * layersCount)
 {
   id = idCount;
   idCount++;
@@ -49,9 +50,18 @@ Brain::Brain(const int & inputsCount,
   initNeurons();
 }
 
+Brain::Brain(const QString & path)
+{
+  id = idCount;
+  idCount++;
+  load(path);
+  initNeurons();
+  //qDebug() << inputs.size();
+}
+
 Brain::~Brain()
 {
-
+  idCount--;
 }
 
 void Brain::compute(const QVector<float> & inputs)
@@ -165,6 +175,10 @@ void Brain::save(const QString & path)
       xml.writeTextElement("ratio", QString::number(ratio));
       xml.writeTextElement("neurons-count",
                            QString::number(neuronBlueprints.size()));
+      xml.writeTextElement("inputs-count",
+                           QString::number(inputs.size()));
+      xml.writeTextElement("outputs-count",
+                           QString::number(outputs.size()));
       xml.writeTextElement("weights-count",
                            QString::number(weights.size()));
       QString weightsStr = QString::number(weights[0], 'f', 6);
@@ -183,6 +197,61 @@ void Brain::save(const QString & path)
     xml.writeEndElement();
     xml.writeEndDocument();
     file.close();
+  }
+}
+
+void Brain::load(const QString & path)
+{
+  // Counts
+  inputsCount = 0;
+  weightsCount = 0;
+  neuronsCount = 0;
+  outputsCount = 0;
+  QString weightsStr;
+  QStringList weightsStrList;
+  QFile file(path);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    return;
+  QXmlStreamReader xml(&file);
+  while (!xml.atEnd())
+  {
+    QXmlStreamReader::TokenType token = xml.readNext();
+    if(token == QXmlStreamReader::StartElement)
+    {
+      if(xml.name() == "neurons-count")
+      {
+        neuronsCount = xml.readElementText().toInt();
+        neuronBlueprints.clear();
+        //neuronBlueprints = QVector<NeuronBlueprint>(neuronsCount, NeuronBlueprint());
+        neurons = QVector<Neuron>(neuronsCount, Neuron());
+      }
+      if(xml.name() == "inputs-count")
+      {
+        inputsCount = xml.readElementText().toInt();
+        inputs = QVector<float>(inputsCount, 0.0f);
+      }
+      if(xml.name() == "outputs-count")
+      {
+        outputsCount = xml.readElementText().toInt();
+        outputs = QVector<float>(outputsCount, 0.0f);
+      }
+      if(xml.name() == "weights-count")
+      {
+        weightsCount = xml.readElementText().toInt();
+        weights = QVector<float>(weightsCount, 0.0f);
+      }
+      if(xml.name() == "weights")
+      {
+        weightsStr = xml.readElementText();
+        weightsStrList = weightsStr.split(';');
+        for(int i = 0 ; i < weightsStrList.size() ; i++)
+          weights[i] = weightsStrList[i].toFloat();
+      }
+      if(xml.name() == "neuron")
+      {
+        neuronBlueprints.push_back(NeuronBlueprint(xml));
+      }
+    }
   }
 }
 
@@ -249,7 +318,7 @@ void Brain::initNeurons()
 {
   //
   neurons.clear();
-  for(int i = 0 ; i < neuronsPerLayer * layersCount ; i++)
+  for(int i = 0 ; i < neuronsCount ; i++)
   {
     neurons.push_back(Neuron());
   }
@@ -271,7 +340,6 @@ void Brain::initNeurons()
       float * a = neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
       neurons[i].addNeuronalInput(a);
     }
-
     for(int j = 0 ;
         j < blueprint.weightIds.size() ;
         j++)

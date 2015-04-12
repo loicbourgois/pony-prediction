@@ -22,14 +22,36 @@ BrainThread::BrainThread(const int &layerCount,
 
 }
 
+BrainThread::BrainThread(const QString & path,
+                         const QVector<QVector<float> > & inputs,
+                         const QVector<Result> & wantedResults,
+                         const int & seed):
+  QThread(),
+  go(false),
+  inputs(inputs),
+  wantedResults(wantedResults),
+  brain(path),
+  seed(seed)
+{
+}
+
 BrainThread::~BrainThread()
 {
+}
+
+void BrainThread::stop()
+{
+  mutexGo.lock();
+  go = false;
+  mutexGo.unlock();
 }
 
 void BrainThread::run()
 {
   qsrand(seed);
-  go = true;
+  mutexGo.lock();
+  bool go = this->go = true;
+  mutexGo.unlock();
   int steps = 0;
   int dataId = 0;
   int stepsPerRun = inputs.size();
@@ -49,5 +71,8 @@ void BrainThread::run()
     dataId++;
     dataId %= inputs.size();
     steps++;
+    mutexGo.lock();
+    go = this->go;
+    mutexGo.unlock();
   }
 }

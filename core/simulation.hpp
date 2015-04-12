@@ -15,7 +15,9 @@ class Simulation
     void prepareData();
     void loadBrains(const int & count, const int & layersPerBrain,
                     const int & neuronsPerLayer);
-    void start();
+    void loadBrains(const QString & path, const int &count);
+    void play();
+    void pause();
     static int idBestBrain;
   private:
     static const QString DATABASE_NAME;

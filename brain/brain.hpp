@@ -14,6 +14,7 @@ class Brain
           const int & neuronsPerLayer,
           const int & layersCount,
           const int & outputsCount);
+    Brain(const QString & path);
     ~Brain();
 
     void compute(const QVector<float> & inputs);
@@ -25,14 +26,18 @@ class Brain
   private:
 
     void save(const QString & path);
+    void load(const QString & path);
     void initBlueprints();
     void initNeurons();
 
     int id;
 
-    int inputsCount;
     int neuronsPerLayer;
     int layersCount;
+
+    int inputsCount;
+    int weightsCount;
+    int neuronsCount;
     int outputsCount;
 
     QVector<float> weights;

@@ -1,8 +1,67 @@
 #include "neuron-blueprint.hpp"
+#include <QDebug>
 
 NeuronBlueprint::NeuronBlueprint()
 {
 
+}
+
+NeuronBlueprint::NeuronBlueprint(QXmlStreamReader & xml)
+{
+  externalInputIds.clear();
+  neuronalInputIds.clear();
+  brainalInputIds.clear();
+  weightIds.clear();
+  while(!xml.atEnd()
+        && !(xml.name() == "neuron"
+             && xml.tokenType() == QXmlStreamReader::EndElement))
+  {
+    QXmlStreamReader::TokenType token = xml.readNext();
+    if(token == QXmlStreamReader::StartElement) // Attributs x 5
+    {
+      if(xml.name() == "external-input-ids")
+      {
+        QString str = xml.readElementText();
+        if(str.size())
+        {
+          QStringList strList = str.split(';');
+          for(int i = 0 ; i < strList.size() ; i++)
+            addExternalInputId(strList[i].toInt());
+        }
+      }
+      if(xml.name() == "neuronal-input-ids")
+      {
+        QString str = xml.readElementText();
+        if(str.size())
+        {
+          QStringList strList = str.split(';');
+          for(int i = 0 ; i < strList.size() ; i++)
+            addNeuronalInputId(strList[i].toInt());
+        }
+      }
+      if(xml.name() == "brainal-input-ids")
+      {
+        QString str = xml.readElementText();
+        if(str.size())
+        {
+          QStringList strList = str.split(';');
+          for(int i = 0 ; i < strList.size() ; i++)
+            addBrainalInputId(strList[i].toInt());
+        }
+      }
+      if(xml.name() == "weight-ids")
+      {
+        QString str = xml.readElementText();
+        if(str.size())
+        {
+          QStringList strList = str.split(';');
+          for(int i = 0 ; i < strList.size() ; i++)
+            addWeightId(strList[i].toInt());
+        }
+      }
+    }
+  }
+  //qDebug() << externalInputIds.size() << neuronalInputIds.size() << brainalInputIds.size();
 }
 
 NeuronBlueprint::~NeuronBlueprint()

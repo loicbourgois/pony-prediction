@@ -19,9 +19,13 @@ class MainWindow : public QMainWindow
     void onMutationFrequencyChanged(double value);
     void onMutationIntensityChanged(double value);
     void onSaveBestBrain();
+    void onLoad();
+    void onPlay();
+    void onPause();
+    void onReset();
   private:
     void addLog(const QString & log);
     Ui::MainWindow *ui;
     Simulation simulation;
-    QString pathToBestBrain;
+    QString pathToSaves;
 };

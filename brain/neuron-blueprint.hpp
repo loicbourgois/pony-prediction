@@ -2,11 +2,13 @@
 
 #include <QVector>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 class NeuronBlueprint
 {
   public:
     NeuronBlueprint();
+    NeuronBlueprint(QXmlStreamReader & xml);
     ~NeuronBlueprint();
 
     void writeToXML(QXmlStreamWriter & xml);

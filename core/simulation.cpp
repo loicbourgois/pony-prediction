@@ -32,6 +32,7 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
   db.setDatabaseName(DATABASE_NAME);
   db.setUserName("root");
   db.setPassword("");
+  races.clear();
   //
   if (ok && !db.open())
   {
@@ -121,6 +122,8 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
 
 void Simulation::prepareData()
 {
+  inputs.clear();
+  wantedResults.clear();
   for(int i = 0 ; i < races.size() ; i++)
   {
     races[i].prepareData();
@@ -133,6 +136,9 @@ void Simulation::loadBrains(const int &count,
                             const int &layersPerBrain,
                             const int &neuronsPerLayer)
 {
+  for(int i = 0 ; i < brainThreads.size() ; i++)
+    delete brainThreads[i];
+  brainThreads.clear();
   for(int i = 0 ; i < count ; i++)
   {
     brainThreads.push_back(
@@ -145,10 +151,33 @@ void Simulation::loadBrains(const int &count,
   }
 }
 
-void Simulation::start()
+void Simulation::loadBrains(const QString & path, const int &count)
+{
+  for(int i = 0 ; i <  brainThreads.size() ; i++)
+    delete brainThreads[i];
+  brainThreads.clear();
+  for(int i = 0 ; i < count ; i++)
+  {
+    brainThreads.push_back(
+          new BrainThread(path,
+                          inputs,
+                          wantedResults,
+                          qrand()));
+  }
+}
+
+void Simulation::play()
 {
   for(int i = 0 ; i < brainThreads.size() ; i++)
   {
     brainThreads[i]->start();
+  }
+}
+
+void Simulation::pause()
+{
+  for(int i = 0 ; i < brainThreads.size() ; i++)
+  {
+    brainThreads[i]->stop();
   }
 }

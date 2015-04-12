@@ -1,6 +1,8 @@
 #include "main-window.hpp"
 #include "ui_main-window.h"
 #include <QDate>
+#include <QDir>
+#include <QFileDialog>
 #include <core/util.hpp>
 #include <brain/brain.hpp>
 
@@ -8,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
   simulation(),
-  pathToBestBrain("C:/Users/Loic/pony-prediction/saves/best.brain")
+  pathToSaves("C:/Users/Loic/pony-prediction/saves")
 {
   //
   ui->setupUi(this);
@@ -48,13 +50,29 @@ MainWindow::MainWindow(QWidget *parent) :
                    SIGNAL(clicked()),
                    this,
                    SLOT(onSaveBestBrain()));
+  QObject::connect(ui->pushButtonLoad,
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(onLoad()));
+  QObject::connect(ui->pushButtonPlay,
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(onPlay()));
+  QObject::connect(ui->pushButtonPause,
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(onPause()));
+  QObject::connect(ui->pushButtonReset,
+                   SIGNAL(clicked()),
+                   this,
+                   SLOT(onReset()));
   ui->doubleSpinBoxMutationFrequency->setValue(0.2f);
   ui->doubleSpinBoxMutationIntensity->setValue(0.2f);
   //
   simulation.loadRaces(QDate(2013, 01, 01), QDate(2013, 01, 31));
   simulation.prepareData();
   simulation.loadBrains(5, 3, 20);
-  simulation.start();
+  onPlay();
 }
 
 MainWindow::~MainWindow()
@@ -79,5 +97,49 @@ void MainWindow::onMutationIntensityChanged(double value)
 
 void MainWindow::onSaveBestBrain()
 {
-  Brain::saveBestBrain(pathToBestBrain);
+  onPause();
+  QDir dir(pathToSaves);
+  if (!dir.exists()) {
+    dir.mkpath(pathToSaves);
+  }
+  QString path = QFileDialog::getSaveFileName(this, "Save", pathToSaves + "/best", "Save (*.brain)");
+  if(path.size())
+  {
+    Brain::saveBestBrain(path);
+  }
+  onPlay();
+}
+
+void MainWindow::onLoad()
+{
+  onPause();
+  QDir dir(pathToSaves);
+  if (!dir.exists()) {
+    dir.mkpath(pathToSaves);
+  }
+  QString path = QFileDialog::getOpenFileName(this, "Open", pathToSaves, "Save (*.brain)");
+  if(path.size())
+  {
+    simulation.loadBrains(path, 5);
+  }
+  onPlay();
+}
+
+void MainWindow::onPlay()
+{
+  ui->pushButtonPlay->setEnabled(false);
+  ui->pushButtonPause->setEnabled(true);
+  simulation.play();
+}
+
+void MainWindow::onPause()
+{
+  ui->pushButtonPlay->setEnabled(true);
+  ui->pushButtonPause->setEnabled(false);
+  simulation.pause();
+}
+
+void MainWindow::onReset()
+{
+
 }
