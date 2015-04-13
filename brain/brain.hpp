@@ -28,6 +28,7 @@ class Brain
     void save(const QString & path);
     void load(const QString & path);
     void initBlueprints();
+    void initBlueprints2();
     void initNeurons();
 
     int id;
@@ -66,6 +67,7 @@ class Brain
       bestBrain.save(path);
       mutexBestBrain.unlock();
     }
+
 
   private:
 
