@@ -7,7 +7,7 @@
 #include <core/util.hpp>
 
 int Simulation::idBestBrain = 0;
-const QString Simulation::DATABASE_NAME = "pony_prediction";
+const QString Simulation::DATABASE_NAME = Util::getLineFromConf("username");
 
 Simulation::Simulation() :
   races(),
@@ -30,8 +30,8 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
   QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
   db.setHostName("localhost");
   db.setDatabaseName(DATABASE_NAME);
-  db.setUserName("root");
-  db.setPassword("*****");
+  db.setUserName(Util::getLineFromConf("username"));
+  db.setPassword(Util::getLineFromConf("password"));
   races.clear();
   //
   if (ok && !db.open())

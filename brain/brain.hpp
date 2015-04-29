@@ -31,6 +31,8 @@ class Brain
     void initBlueprints2();
     void initNeurons();
 
+
+
     int id;
 
     int neuronsPerLayer;
@@ -54,6 +56,7 @@ class Brain
 
   public:
 
+    static void uploadBestBrain(const QString & ip);
     static void setMutationFrequency(const float & ratio){
       mutexMutationFrequency.lock();
       mutationFrequency = ratio;
@@ -67,7 +70,6 @@ class Brain
       bestBrain.save(path);
       mutexBestBrain.unlock();
     }
-
 
   private:
 

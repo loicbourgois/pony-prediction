@@ -2,6 +2,7 @@
 #include "ui/main-window.hpp"
 #include <QString>
 #include <QThread>
+#include <QFile>
 
 MainWindow * Util::mainWindow = nullptr;
 
@@ -39,4 +40,28 @@ void Util::init(MainWindow * mainWindow)
 void Util::addLog(const QString & log)
 {
   emit mainWindow->newLog(log);
+}
+
+QString Util::getLineFromConf(const QString & id)
+{
+  QString output = "";
+  QFile file("./conf.xml");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+    qDebug() << "error eiurgyeirug";
+    return QString();
+  }
+  QXmlStreamReader xml(&file);
+  while (!xml.atEnd())
+  {
+    QXmlStreamReader::TokenType token = xml.readNext();
+    if(token == QXmlStreamReader::StartElement)
+    {
+      if(xml.name() == id)
+      {
+        output = xml.readElementText();
+      }
+    }
+  }
+  return output;
 }

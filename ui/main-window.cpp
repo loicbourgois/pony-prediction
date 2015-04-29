@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
   simulation(),
-  pathToSaves("C:/Users/Loic/pony-prediction/saves")
+  pathToSaves(Util::getLineFromConf("pathToSaves"))
 {
   //
   ui->setupUi(this);
@@ -66,12 +66,13 @@ MainWindow::MainWindow(QWidget *parent) :
                    SIGNAL(clicked()),
                    this,
                    SLOT(onReset()));
-  ui->doubleSpinBoxMutationFrequency->setValue(0.2f);
-  ui->doubleSpinBoxMutationIntensity->setValue(0.2f);
+  ui->doubleSpinBoxMutationFrequency->setValue(Util::getLineFromConf("mutationFrequency").toFloat());
+  ui->doubleSpinBoxMutationIntensity->setValue(Util::getLineFromConf("mutationIntensity").toFloat());
   //
-  simulation.loadRaces(QDate(2013, 01, 01), QDate(2013, 01, 31));
+  simulation.loadRaces(QDate(2014, 01, 01), QDate(2014, 01, 31));
   simulation.prepareData();
-  simulation.loadBrains(5, 4, 20);
+  simulation.loadBrains(Util::getLineFromConf("brainCount").toFloat(),
+    Util::getLineFromConf("layerCount").toFloat(), 20);
   onPlay();
 }
 
@@ -142,4 +143,9 @@ void MainWindow::onPause()
 void MainWindow::onReset()
 {
 
+}
+
+void MainWindow::on_pushButtonTest_clicked()
+{
+  Brain::uploadBestBrain("www.loicbourgois.com");
 }

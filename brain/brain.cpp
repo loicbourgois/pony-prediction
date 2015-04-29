@@ -2,6 +2,15 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamWriter>
+#include <QSqlQuery>
+#include <QSqlDatabase>
+#include <QDate>
+#include <QUrl>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
+#include <QSqlError>
+#include <QEventLoop>
+#include <QNetworkInterface>
 #include "core/util.hpp"
 
 int Brain::idCount = 0;
@@ -411,7 +420,99 @@ void Brain::initNeurons()
       neurons[i].addWeight(a);
     }
   }
+}
 
+void Brain::uploadBestBrain(const QString & ip)
+{
+  bool ok = true;
+  QString error = "";
+  // Save file local
+  if(ok)
+  {
+    mutexBestBrain.lock();
+    bestBrain.save("./temp.brain");
+    mutexBestBrain.unlock();
+  }
+  // Upload file
+  if(ok)
+  {
+    QUrl url(ip);
+    url.setUserName(Util::getLineFromConf("username"));
+    url.setPassword(Util::getLineFromConf("password"));
+    QString filePath = "./temp.brain";
+    if(QFile::exists(filePath))
+    {
+      qDebug() << "exists!";
+    }
+    QFile data(filePath);
+    if(data.open(QIODevice::ReadOnly))
+    {
+      qDebug() << "File Accessed";
+      QNetworkAccessManager nam;
+
+      QNetworkReply *reply = nam.put(QNetworkRequest(url), (QIODevice*)&data);
+      QEventLoop eventLoop;
+      QObject::connect(reply, SIGNAL(finished()),
+                       &eventLoop, SLOT(quit()));
+      eventLoop.exec(); // wait until download is done
+      qDebug() << "upload done";
+      if (reply->error() == QNetworkReply::NoError)
+      {
+        qDebug() << "No errors occured";
+      }
+    }
+  }
+  // Database
+  QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+  db.setHostName(ip);
+  db.setPort(3306);
+  db.setDatabaseName(Util::getLineFromConf("username"));
+  db.setUserName(Util::getLineFromConf("username"));
+  db.setPassword(Util::getLineFromConf("password"));
+  if (ok && !db.open())
+  {
+    ok = false;
+    error = "Database error occurred : " + db.lastError().text();
+  }
+  if(ok)
+  {
+    QSqlQuery query;
+    QString datetime =
+        QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
+    QString ip = "myip";
+    QString mac = "default-mac";
+    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    {
+      mac = interface.hardwareAddress();
+    }
+    QString ratio = "ratio";
+    mutexBestBrain.lock();
+    ratio = QString::number(bestBrain.ratio);
+    mutexBestBrain.unlock();
+    QString path = "mypath";
+    path = "erfgver.brain";
+    qDebug() << "bob-4";
+    query.prepare("INSERT INTO brains"
+                  "(datetime, ip, mac, ratio, path)"
+                  "VALUES('"
+                  + datetime +"' , '"
+                  + ip +"' , '"
+                  + mac +" ',' "
+                  + ratio +" ',' "
+                  + path + "');");
+    if(!query.exec())
+      qDebug() << "Error with query : " << query.lastError().text();
+  }
+  // Delete file
+  if(ok)
+  {
+    qDebug() << "todo : delete";
+  }
+  // Errors ?
+  if(!ok)
+  {
+    qDebug() << error;
+  }
 }
 
 /*******************************************************************************

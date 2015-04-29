@@ -18,6 +18,7 @@ class Util// : public QObject
     static void debug(const QVector<int> & arg);
     static void init(MainWindow * mainWindow);
     static void addLog(const QString & log);
+    static QString getLineFromConf(const QString & id);
   private:
     static MainWindow * mainWindow;
     /*signals:

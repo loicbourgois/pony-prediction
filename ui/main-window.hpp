@@ -23,6 +23,8 @@ class MainWindow : public QMainWindow
     void onPlay();
     void onPause();
     void onReset();
+    void on_pushButtonTest_clicked();
+
   private:
     void addLog(const QString & log);
     Ui::MainWindow *ui;
