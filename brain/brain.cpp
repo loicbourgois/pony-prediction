@@ -440,27 +440,39 @@ void Brain::uploadBestBrain(const QString & ip)
     url.setUserName(Util::getLineFromConf("username"));
     url.setPassword(Util::getLineFromConf("password"));
     QString filePath = "./temp.brain";
-    if(QFile::exists(filePath))
+    if(ok && !QFile::exists(filePath))
     {
-      qDebug() << "exists!";
+      ok = false;
+      error = "Cannot find temp.brain";
     }
     QFile data(filePath);
     if(data.open(QIODevice::ReadOnly))
     {
-      qDebug() << "File Accessed";
       QNetworkAccessManager nam;
-
       QNetworkReply *reply = nam.put(QNetworkRequest(url), (QIODevice*)&data);
       QEventLoop eventLoop;
       QObject::connect(reply, SIGNAL(finished()),
                        &eventLoop, SLOT(quit()));
-      eventLoop.exec(); // wait until download is done
-      qDebug() << "upload done";
-      if (reply->error() == QNetworkReply::NoError)
+      eventLoop.exec();
+      if (reply->error() != QNetworkReply::NoError)
       {
-        qDebug() << "No errors occured";
+        qDebug() << "Errors occured for sftp transfert";
       }
     }
+  }
+  // Prepare hash
+  QString hash = "";
+  QFile file("./temp.brain");
+  QCryptographicHash hasher(QCryptographicHash::Sha1);
+  if(ok && !file.open(QIODevice::ReadOnly))
+  {
+    ok = false;
+    error = "Couldn't open temp brain save.";
+  }
+  else
+  {
+    hasher.addData(&file);
+    hash = hasher.result().toHex();
   }
   // Database
   QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
@@ -489,8 +501,7 @@ void Brain::uploadBestBrain(const QString & ip)
     mutexBestBrain.lock();
     ratio = QString::number(bestBrain.ratio);
     mutexBestBrain.unlock();
-    QString path = "mypath";
-    path = "zefzefzef.brain";
+    QString path = hash + ".brain";
     query.prepare("INSERT INTO brains"
                   "(datetime, ip, mac, ratio, path)"
                   "VALUES('"
@@ -510,7 +521,7 @@ void Brain::uploadBestBrain(const QString & ip)
   // Errors ?
   if(!ok)
   {
-    qDebug() << error;
+    qDebug() << "Error : Couldn\'t upload brain to server : " << error;
   }
 }
 
