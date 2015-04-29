@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->doubleSpinBoxMutationFrequency->setValue(0.2f);
   ui->doubleSpinBoxMutationIntensity->setValue(0.2f);
   //
-  simulation.loadRaces(QDate(2013, 01, 01), QDate(2013, 1, 31));
+  simulation.loadRaces(QDate(2013, 01, 01), QDate(2013, 01, 31));
   simulation.prepareData();
   simulation.loadBrains(5, 4, 20);
   onPlay();

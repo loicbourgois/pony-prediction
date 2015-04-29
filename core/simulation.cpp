@@ -31,7 +31,7 @@ bool Simulation::loadRaces(const QDate & startingDay, const QDate & endingDay)
   db.setHostName("localhost");
   db.setDatabaseName(DATABASE_NAME);
   db.setUserName("root");
-  db.setPassword("");
+  db.setPassword("*****");
   races.clear();
   //
   if (ok && !db.open())
