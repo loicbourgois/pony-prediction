@@ -480,18 +480,17 @@ void Brain::uploadBestBrain(const QString & ip)
     QString datetime =
         QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
     QString ip = "myip";
-    QString mac = "default-mac";
+    QString mac = "";
     foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
-    {
-      mac = interface.hardwareAddress();
-    }
+      mac += interface.hardwareAddress() + " - ";
+    if(mac.size())
+      mac.remove(mac.size()-3, 3);
     QString ratio = "ratio";
     mutexBestBrain.lock();
     ratio = QString::number(bestBrain.ratio);
     mutexBestBrain.unlock();
     QString path = "mypath";
-    path = "erfgver.brain";
-    qDebug() << "bob-4";
+    path = "zefzefzef.brain";
     query.prepare("INSERT INTO brains"
                   "(datetime, ip, mac, ratio, path)"
                   "VALUES('"
